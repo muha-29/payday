@@ -50,3 +50,17 @@ export async function updateAvatar(req, res) {
 
   res.json(updated);
 }
+
+
+export async function updateProfile(req, res) {
+  const userId = req.user.id;
+  const updates = req.body;
+
+  const profile = await Profile.findOneAndUpdate(
+    { userId },
+    { $set: updates },
+    { new: true }
+  ).lean();
+
+  res.json(profile);
+}

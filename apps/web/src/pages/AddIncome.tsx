@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { addIncome } from '../api/income';
 import { useNavigate } from 'react-router-dom';
+import { speak } from '../utils/speak';
+import { useProfile } from '../hooks/useProfile';
 
 export default function AddIncome() {
     const [amount, setAmount] = useState('');
     const navigate = useNavigate();
-
+    const profile = useProfile();
     async function handleAdd() {
         if (!amount) return;
 
@@ -13,6 +15,11 @@ export default function AddIncome() {
             amount: Number(amount),
             note: 'manual'
         });
+
+        speak(
+            `₹${amount} added to your earnings`,
+            profile.language
+        );
 
         navigate('/earnings');
     }

@@ -7,6 +7,7 @@ export type Profile = {
   userId: string;
   email: string;
   avatarPath?: string;
+  language : string;
   onboarding?: {
     incomeRange?: string;
     completed?: boolean;
@@ -42,5 +43,18 @@ export function updateAvatar(avatarPath: string) {
   return apiFetch('/profile/avatar', {
     method: 'PATCH',
     body: JSON.stringify({ avatarPath })
+  });
+}
+
+export type UpdateProfilePayload = {
+  language?: string;
+  name?: string;
+  workType?: string;
+};
+
+export function updateProfile(payload: UpdateProfilePayload) {
+  return apiFetch('/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
   });
 }

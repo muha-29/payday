@@ -6,6 +6,7 @@ import savingsRoutes from './routes/savings.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import earningsRoutes from './routes/earnings.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import aiRoutes from './routes/ai.routes.js';
 
 
 
@@ -26,6 +27,7 @@ app.use('/api/savings', savingsRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/earnings', earningsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/ai', aiRoutes);
 
 
 export default app;

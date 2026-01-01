@@ -5,7 +5,10 @@ const ProfileSchema = new mongoose.Schema(
         userId: { type: String, required: true, unique: true }, // Supabase user id
         email: { type: String },
         avatarPath: { type: String },
-
+        language: {
+            type: String,
+            default: 'te-IN'
+        },
         onboarding: {
             incomeRange: String,
             completed: { type: Boolean, default: false }

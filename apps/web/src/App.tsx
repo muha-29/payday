@@ -8,6 +8,7 @@ import Savings from './pages/Savings';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import AddGoal from './pages/AddGoal';
+import ChatHistory from './pages/ChatHistory';
 
 export default function App() {
   return (
@@ -28,7 +29,7 @@ export default function App() {
 
         <Route path="savings" element={<Savings />} />
         <Route path="/add-goal" element={<AddGoal />} />
-
+        <Route path="/profile/history" element={<ChatHistory />} />
         <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>)
