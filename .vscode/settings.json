@@ -1,0 +1,32 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#073521",
+    "statusBar.background": "#094A2E",
+    "statusBar.foreground": "#F1FDF8",
+    "titleBar.activeBackground": "#094A2E",
+    "titleBar.activeForeground": "#F1FDF8",
+    "titleBar.inactiveBackground": "#094A2E"
+  }
+}
