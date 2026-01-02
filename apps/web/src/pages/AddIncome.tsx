@@ -7,7 +7,7 @@ import { useProfile } from '../hooks/useProfile';
 export default function AddIncome() {
     const [amount, setAmount] = useState('');
     const navigate = useNavigate();
-    const profile = useProfile();
+    const profile = useProfile().profile;
     async function handleAdd() {
         if (!amount) return;
 
@@ -15,7 +15,8 @@ export default function AddIncome() {
             amount: Number(amount),
             note: 'manual'
         });
-
+        console.log('profile', profile)
+        console.log('profile.language:', profile.language);
         speak(
             `₹${amount} added to your earnings`,
             profile.language
