@@ -17,7 +17,7 @@ export default function Profile() {
 
   const [userLan, setUserLan] = useState(profile.profile?.language || 'en');
 
-  console.log('Profile data:', profile.profile);
+  console.log('Profile data:', profile.profile); 
 
   useEffect(() => {
     async function loadUser() {
