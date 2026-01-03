@@ -5,10 +5,9 @@ import { Outlet } from 'react-router-dom';
 export default function AppLayout() {
     return (
         <div className="min-h-screen bg-stone-50">
-            <Header />
+            <Header name="Friend" />
 
-            {/* space for fixed header */}
-            <main className="pt-40 pb-24">
+            <main className="pt-4 pb-24 px-4">
                 <Outlet />
             </main>
 

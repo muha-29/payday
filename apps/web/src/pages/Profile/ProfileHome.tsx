@@ -12,7 +12,10 @@ export default function Profile() {
 
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const profile = useProfile();
+
+  const [userLan, setUserLan] = useState(profile.profile?.language || 'en');
 
   console.log('Profile data:', profile.profile);
 
@@ -27,6 +30,25 @@ export default function Profile() {
 
     loadUser();
   }, []);
+
+  const langChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLang = e.target.value;
+    setUserLan(newLang);
+
+    try {
+      setSaving(true);
+      if (profile.profile) {
+        const updatedProfile = {
+          ...profile.profile,
+          language: newLang
+        };
+        await updateProfile(updatedProfile);
+      }
+    } finally {
+      setSaving(false);
+    }
+
+  };
 
   if (loading) {
     return (
@@ -70,9 +92,15 @@ export default function Profile() {
             Used by PayDay voice assistant
           </p>
           <select
-            value={profile.profile?.language}
-            onChange={(e) => updateProfile({ language: e.target.value })}
-            className="w-full mt-2 p-2 border rounded-xl"
+            value={userLan}
+            onChange={e => langChange(e)}
+            className="
+              w-full mt-1
+              rounded-lg border
+              px-3 py-2
+              text-sm
+              focus:outline-none
+              focus:ring-2 focus:ring-orange-400"
           >
             <option value="en">English</option>
             <option value="hi">Hindi</option>
@@ -80,7 +108,11 @@ export default function Profile() {
             <option value="te">Telugu</option>
           </select>
         </div>
-
+        {saving && (
+          <p className="text-xs text-orange-500 mt-1">
+            Saving preference…
+          </p>
+        )}
         {
           canInstall && (
             <button

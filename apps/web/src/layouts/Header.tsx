@@ -1,87 +1,57 @@
-import { Bell, Mic, User, Sparkles } from 'lucide-react';
-import { useProfile } from '../hooks/useProfile';
+import { useNavigate } from 'react-router-dom';
+import { Bell, User, Mic } from 'lucide-react';
 import { getGreeting, getFormattedDate } from '../utils/dateUtils';
-import { VoiceAssistant } from '../components/ai/VoiceAssistant';
 
-export default function Header() {
-    const { profile } = useProfile();
+export default function Header({ name }: { name: string }) {
+    const navigate = useNavigate();
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-40
-      bg-gradient-to-r from-orange-500 to-amber-400
-      px-4 pt-4 pb-6 rounded-b-3xl">
-
+        <header className="bg-gradient-to-b from-orange-500 to-amber-600 px-4 pt-4 pb-6 rounded-b-2xl">
             <div className="flex justify-between items-start">
-
-                {/* LEFT */}
+                {/* Left */}
                 <div>
-                    <p className="text-white/90 text-xs">
+                    <p className="text-xs text-white/80">
                         {getGreeting()}
                     </p>
-
-                    <h1 className="text-white text-lg font-bold">
-                        Hello, {profile?.name || 'Friend'}! 👋
+                    <h1 className="text-white text-lg font-semibold">
+                        Hello, {name}! 👋
                     </h1>
-
-                    <p className="text-white/80 text-xs">
+                    <p className="text-xs text-white/80">
                         {getFormattedDate()}
                     </p>
-
-                    <span className="inline-block mt-2 px-3 py-1 text-xs
-            bg-white/90 text-orange-600 rounded-full">
-                        🔥 You’re saving regularly
-                    </span>
                 </div>
 
-                {/* RIGHT ICONS */}
+                {/* Right Icons */}
                 <div className="flex items-center gap-3">
-
                     {/* Notifications */}
-                    <IconBadge count={2}>
-                        <Bell size={18} className="text-orange-600" />
-                    </IconBadge>
+                    <button className="relative bg-white/20 p-2 rounded-full">
+                        <Bell size={18} className="text-white" />
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-[10px] text-white rounded-full flex items-center justify-center">
+                            2
+                        </span>
+                    </button>
 
-                    {/* 🎤 Voice Agent */}
-                    <VoiceAssistant
-                        trigger={
-                            <button className="relative p-3 rounded-full bg-orange-500 text-white shadow-lg active:scale-95 transition">
-                                <Mic size={18} />
-                                {/* animated pulse */}
-                                <span className="absolute inset-0 rounded-full animate-ping bg-orange-400 opacity-30" />
-                            </button>
-                        }
-                    />
+                    {/* Voice Agent */}
+                    <button className="bg-white/20 p-2 rounded-full">
+                        <Mic size={18} className="text-white" />
+                    </button>
 
                     {/* Profile */}
-                    <Icon>
-                        <User size={18} className="text-stone-600" />
-                    </Icon>
+                    <button
+                        onClick={() => navigate('/app/profile')}
+                        className="bg-white p-2 rounded-full"
+                    >
+                        <User size={18} className="text-orange-500" />
+                    </button>
                 </div>
             </div>
-        </header>
-    );
-}
 
-/* ---------- small helper ---------- */
-function Icon({ children }: { children: React.ReactNode }) {
-    return (
-        <button className="p-3 rounded-full bg-white shadow">
-            {children}
-        </button>
-    );
-}
-
-function IconBadge({ children, count }: { children: React.ReactNode; count?: number }) {
-    return (
-        <button className="relative p-3 rounded-full bg-white shadow">
-            {children}
-            {count && (
-                <span className="absolute -top-1 -right-1
-          bg-red-500 text-white text-[10px]
-          w-4 h-4 rounded-full flex items-center justify-center">
-                    {count}
+            {/* Status pill */}
+            <div className="mt-3">
+                <span className="inline-block bg-white/90 text-orange-600 text-xs px-3 py-1 rounded-full">
+                    🔥 You’re saving regularly
                 </span>
-            )}
-        </button>
+            </div>
+        </header>
     );
 }
