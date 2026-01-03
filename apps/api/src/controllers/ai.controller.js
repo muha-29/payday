@@ -22,10 +22,12 @@ export async function askAI(req, res) {
 
     await VoiceConversation.create({
         userId,
-        intent,
-        input: { text: question, language },
-        output: { text: answer, language, audioUrl }
+        question,
+        answer,
+        language,
+        intent
     });
+
 
     res.json({ answer, audioUrl });
 }

@@ -2,26 +2,54 @@ import mongoose from 'mongoose';
 
 const VoiceConversationSchema = new mongoose.Schema(
     {
-        userId: { type: String, required: true, index: true },
+        userId: {
+            type: String,
+            required: true,
+            index: true
+        },
+
+        question: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        answer: {
+            type: String,
+            required: true,
+            trim: true
+        },
+
+        language: {
+            type: String,
+            default: 'en-IN'
+        },
 
         intent: {
             type: String,
-            enum: ['savings', 'earnings', 'dashboard', 'general'],
+            enum: [
+                'dashboard',
+                'income',
+                'savings',
+                'goal',
+                'general',
+                'unknown'
+            ],
             default: 'general'
         },
 
-        input: {
-            text: { type: String, required: true },
-            language: { type: String }
-        },
-
-        output: {
-            text: { type: String, required: true },
-            language: { type: String },
-            audioUrl: { type: String } // 🔊 stored TTS output
+        source: {
+            type: String,
+            enum: ['voice', 'text'],
+            default: 'voice'
         }
     },
-    { timestamps: true }
+    {
+        timestamps: true
+    }
 );
 
-export default mongoose.model('VoiceConversation', VoiceConversationSchema);
+export default mongoose.model(
+    'VoiceConversation',
+    VoiceConversationSchema
+);

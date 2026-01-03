@@ -1,14 +1,14 @@
 import { Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import Layout from './layouts/AppLayout';
+import Layout from './components/Layout';
 import Home from './pages/Home';
-import Earnings from './pages/Earnings/EarningsHome';
-import AddIncome from './pages/Earnings/AddEarning';
-import Savings from './pages/Savings/SavingsHome';
-import Profile from './pages/Profile/ProfileHome';
+import Earnings from './pages/Earnings';
+import AddIncome from './pages/AddIncome';
+import Savings from './pages/Savings';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import AddGoal from './pages/AddGoal';
-import ChatHistory from './pages/Profile/ChatHistory';
+import ChatHistory from './pages/ChatHistory';
 
 export default function App() {
   return (

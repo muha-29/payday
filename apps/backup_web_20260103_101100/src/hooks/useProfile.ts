@@ -4,7 +4,6 @@ import { fetchProfile } from '../api/profile';
 export type UserProfile = {
     userId: string;
     email: string;
-    name: string;
     language: 'te-IN' | 'en-IN';
     onboarding: {
         incomeRange: String,

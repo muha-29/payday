@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global defaults */
+html, body {
+  @apply bg-stone-50 text-stone-900;
+}

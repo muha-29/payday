@@ -1,10 +1,10 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import Layout from './layouts/AppLayout';
+import Layout from './components/Layout';
 import Home from './pages/Home';
-import Earnings from './pages/Earnings/EarningsHome';
-import Savings from './pages/Savings/SavingsHome';
-import Profile from './pages/Profile/ProfileHome';
+import Earnings from './pages/Earnings';
+import Savings from './pages/Savings';
+import Profile from './pages/Profile';
 import Onboarding from './pages/Onboarding';
 
 type RouterProps = {
