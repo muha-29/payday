@@ -1,59 +1,47 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { NavLink } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useProfile } from '../../hooks/useProfile';
-import { updateProfile } from '../../api/profile';
-
-import { usePWAInstall } from '../../hooks/usePWAInstall';
-
+import { useI18n } from '../../hooks/useI18n';
 
 export default function Profile() {
-  const { canInstall, install } = usePWAInstall();
+  const { profile, loading, updateProfile } = useProfile();
+  const { t } = useI18n();
 
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const profile = useProfile();
-
-  const [userLan, setUserLan] = useState(profile.profile?.language || 'en');
-
-  console.log('Profile data:', profile.profile); 
 
   useEffect(() => {
     async function loadUser() {
-      const { data, error } = await supabase.auth.getUser();
-      if (!error) {
-        setUser(data.user);
-      }
-      setLoading(false);
+      const { data } = await supabase.auth.getUser();
+      setUser(data?.user || null);
     }
-
     loadUser();
   }, []);
 
-  const langChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  async function handleLanguageChange(
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) {
     const newLang = e.target.value;
-    setUserLan(newLang);
 
     try {
       setSaving(true);
-      if (profile.profile) {
-        const updatedProfile = {
-          ...profile.profile,
-          language: newLang
-        };
-        await updateProfile(updatedProfile);
-      }
+      await updateProfile({ language: newLang });
+      toast('🚧 '+t('savingPreference'), {
+        icon: '⏳'
+      });
+      // ✅ Force full reload after save
+      window.location.replace('/app/home');
     } finally {
       setSaving(false);
     }
-
-  };
+  }
 
   if (loading) {
     return (
       <div className="p-4 text-stone-500">
-        Loading profile…
+        {t('loadingProfile')}…
       </div>
     );
   }
@@ -62,13 +50,17 @@ export default function Profile() {
     <div>
       {/* Sticky Header */}
       <div className="sticky top-0 bg-white z-20 border-b px-4 py-3">
-        <h1 className="text-xl font-bold">Profile</h1>
+        <h1 className="text-xl font-bold">
+          {t('profile')}
+        </h1>
       </div>
 
       <div className="px-4 pt-4 space-y-4">
         {/* User Info */}
         <div className="bg-white rounded-2xl p-4 shadow">
-          <p className="text-sm text-stone-500">Email</p>
+          <p className="text-sm text-stone-500">
+            {t('email')}
+          </p>
           <p className="font-medium">
             {user?.email || '—'}
           </p>
@@ -79,57 +71,56 @@ export default function Profile() {
           to="/profile/history"
           className="block bg-white rounded-2xl p-4 shadow hover:bg-orange-50 transition"
         >
-          <p className="font-medium">🗣 PayDay Chat History</p>
+          <p className="font-medium">
+            🗣 {t('payDayChatHistory')}
+          </p>
           <p className="text-sm text-stone-500">
-            View your previous voice & AI conversations
+            {t('viewYourPreviousVoiceAndAIConversations')}
           </p>
         </NavLink>
 
-        {/* Language Settings (future-ready) */}
+        {/* Language */}
         <div className="bg-white rounded-2xl p-4 shadow">
-          <p className="font-medium">Language</p>
-          <p className="text-sm text-stone-500">
-            Used by PayDay voice assistant
+          <p className="font-medium">
+            {t('language')}
           </p>
+          <p className="text-sm text-stone-500">
+            {t('usedByPayDayVoiceAssistant')}
+          </p>
+
           <select
-            value={userLan}
-            onChange={e => langChange(e)}
+            value={profile?.language || 'en'}
+            onChange={handleLanguageChange}
             className="
-              w-full mt-1
-              rounded-lg border
-              px-3 py-2
-              text-sm
+              w-full mt-2 rounded-lg border
+              px-3 py-2 text-sm
               focus:outline-none
-              focus:ring-2 focus:ring-orange-400"
+              focus:ring-2 focus:ring-orange-400
+            "
           >
             <option value="en">English</option>
             <option value="hi">Hindi</option>
             <option value="ta">Tamil</option>
             <option value="te">Telugu</option>
           </select>
+
+          {saving && (
+            <p className="text-xs text-orange-500 mt-1">
+              {t('savingPreference')}…
+            </p>
+          )}
         </div>
-        {saving && (
-          <p className="text-xs text-orange-500 mt-1">
-            Saving preference…
-          </p>
-        )}
-        {
-          canInstall && (
-            <button
-              onClick={install}
-              className="w-full py-3 rounded-xl bg-orange-500 text-white"
-            >
-              Install PayDay App
-            </button>
-          )
-        }
 
         {/* Logout */}
         <button
           onClick={() => supabase.auth.signOut()}
-          className="w-full py-3 rounded-xl border border-red-500 text-red-500 font-medium"
+          className="
+            w-full py-3 rounded-xl
+            border border-red-500
+            text-red-500 font-medium
+          "
         >
-          Logout
+          {t('logout')}
         </button>
       </div>
     </div>

@@ -1,0 +1,27 @@
+export default {
+    greeting: 'Hello',
+    todayEarnings: "Today's Earnings",
+    saved: 'Saved',
+    spent: 'Spent',
+    addEarning: "Add Today's Earning",
+    aiInsight: 'AI Insight',
+    weekly: 'This Week',
+    monthly: 'This Month',
+    pending: 'Pending',
+    profile: 'Profile',
+    logout: 'Logout',
+    email: 'Email',
+    language: 'Language',
+    loadingProfile: 'Loading profile',
+    savingPreference: 'Saving preference',
+    payDayChatHistory: 'PayDay Chat History',
+    viewYourPreviousVoiceAndAIConversations:
+        'View your previous voice and AI conversations',
+    usedByPayDayVoiceAssistant:
+        'Used by PayDay voice assistant',
+    savedPreference: 'Preference saved',
+    Hello: 'Hello',
+    GoodMorning: 'Good Morning',
+    GoodAfternoon: 'Good Afternoon',
+    GoodEvening: 'Good Evening',
+};
