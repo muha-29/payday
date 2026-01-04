@@ -4,11 +4,11 @@ import te from './te';
 import ta from './ta';
 
 export const LANGUAGES: Record<string, any> = {
-    'en': en,
-    'hi': hi,
-    'te': te,
-    'ta': ta
+    'en-IN': en,
+    'hi-IN': hi,
+    'te-IN': te,
+    'ta-IN': ta
 };
 
-export const DEFAULT_LANG = 'en';
+export const DEFAULT_LANG = 'en-IN';
 export const SUPPORTED_LANGS = Object.keys(LANGUAGES);

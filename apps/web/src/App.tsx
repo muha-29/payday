@@ -29,7 +29,7 @@ export default function App() {
 
         <Route path="savings" element={<Savings />} />
         <Route path="/add-goal" element={<AddGoal />} />
-        <Route path="/profile/history" element={<ChatHistory />} />
+        <Route path="/app/profile/history" element={<ChatHistory />} />
         <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>)

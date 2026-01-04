@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, User, Mic } from 'lucide-react';
 import { getGreeting, getFormattedDate } from '../utils/dateUtils';
 import { useI18n } from '../hooks/useI18n';
+import { VoiceAssistant } from '../components/ai/VoiceAssistant';
 
 export default function Header({ name }: { name: string }) {
     const navigate = useNavigate();
@@ -33,10 +34,16 @@ export default function Header({ name }: { name: string }) {
                         </span>
                     </button>
 
-                    {/* Voice Agent */}
-                    <button className="bg-white/20 p-2 rounded-full">
-                        <Mic size={18} className="text-white" />
-                    </button>
+                    {/* 🎤 Voice Agent */}
+                    <VoiceAssistant
+                        trigger={
+                            <button className="relative p-3 rounded-full bg-orange-500 text-white shadow-lg active:scale-95 transition">
+                                <Mic size={18} />
+                                {/* animated pulse */}
+                                <span className="absolute inset-0 rounded-full animate-ping bg-orange-400 opacity-30" />
+                            </button>
+                        }
+                    />
 
                     {/* Profile */}
                     <button

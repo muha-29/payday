@@ -52,14 +52,7 @@ export function VoiceAssistant() {
                     start();
                 }}
                 aria-label="Talk to PayDay"
-                className="
-          w-14 h-14 rounded-full
-          bg-gradient-to-r from-orange-500 to-amber-500
-          text-white text-xl
-          shadow-xl
-          active:scale-95
-          flex items-center justify-center
-        "
+                className="w-14 h-14 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xl shadow-xl active:scale-95flex items-center justify-center"
             >
                 🎤
             </button>

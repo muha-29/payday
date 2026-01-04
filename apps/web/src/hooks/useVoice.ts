@@ -4,11 +4,11 @@ export function useVoice(
 ) {
     const start = () => {
         const SpeechRecognition =
-            window.SpeechRecognition ||
-            window.webkitSpeechRecognition;
+            (window as any).SpeechRecognition ||
+            (window as any).webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
-            alert('Voice not supported');
+            alert('Speech recognition not supported');
             return;
         }
 
@@ -17,8 +17,14 @@ export function useVoice(
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
-        recognition.onresult = (e) => {
-            onResult(e.results[0][0].transcript);
+        recognition.onresult = (event: any) => {
+            const text = event.results[0][0].transcript;
+            console.log('🎙️ Voice captured:', text); // 🔴 MUST SEE THIS
+            onResult(text); // 🔥 THIS WAS MISSING OR NOT FIRING
+        };
+
+        recognition.onerror = (err: any) => {
+            console.error('Voice error:', err);
         };
 
         recognition.start();

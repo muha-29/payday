@@ -25,6 +25,7 @@ import Login from './pages/Login';
 import { Toaster } from 'react-hot-toast';
 import Learn from './pages/Learn';
 import { registerSW } from 'virtual:pwa-register';
+import ChatHistory from './pages/Profile/ChatHistory';
 
 
 const router = createBrowserRouter([
@@ -54,6 +55,7 @@ const router = createBrowserRouter([
             { path: 'savings', element: <Savings /> },
             { path: 'profile', element: <Profile /> },
             { path: 'learn', element: <Learn /> },
+            { path: 'profile/history', element: <ChatHistory /> },
         ]
     }
 ]);

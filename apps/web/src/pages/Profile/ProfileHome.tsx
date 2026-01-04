@@ -68,7 +68,7 @@ export default function Profile() {
 
         {/* AI Chat History */}
         <NavLink
-          to="/profile/history"
+          to="/app/profile/history"
           className="block bg-white rounded-2xl p-4 shadow hover:bg-orange-50 transition"
         >
           <p className="font-medium">
@@ -98,10 +98,10 @@ export default function Profile() {
               focus:ring-2 focus:ring-orange-400
             "
           >
-            <option value="en">English</option>
-            <option value="hi">Hindi</option>
-            <option value="ta">Tamil</option>
-            <option value="te">Telugu</option>
+            <option value="en-IN">English</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="ta-IN">Tamil</option>
+            <option value="te-IN">Telugu</option>
           </select>
 
           {saving && (
