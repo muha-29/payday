@@ -1,40 +1,28 @@
 import { useEffect, useState } from 'react';
-import { fetchProfile } from '../api/profile';
-
-export type UserProfile = {
-    userId: string;
-    email: string;
-    name: string;
-    language: 'te-IN' | 'en-IN';
-    onboarding: {
-        incomeRange: String,
-        completed: { type: Boolean, default: false }
-    }
-};
+import { supabase } from '../lib/supabase';
+import { fetchProfile as getProfile, updateProfile as apiUpdateProfile } from '../api/profile';
 
 export function useProfile() {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         let mounted = true;
 
         async function loadProfile() {
-            try {
-                const data = await fetchProfile();
+            const {
+                data: { user }
+            } = await supabase.auth.getUser();
 
-                if (mounted) {
-                    setProfile(data);
-                }
-            } catch (err: any) {
-                if (mounted) {
-                    setError(err);
-                }
-            } finally {
-                if (mounted) {
-                    setLoading(false);
-                }
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+
+            const data = await getProfile();
+            if (mounted) {
+                setProfile(data);
+                setLoading(false);
             }
         }
 
@@ -45,10 +33,21 @@ export function useProfile() {
         };
     }, []);
 
+    /** 🔥 THIS is the key */
+    async function updateProfileLocal(payload: any) {
+        // 1. Optimistic UI update
+        setProfile((prev: any) => ({
+            ...prev,
+            ...payload
+        }));
+
+        // 2. Persist to backend
+        await apiUpdateProfile(payload);
+    }
+
     return {
         profile,
         loading,
-        error,
-        setProfile // useful for updates (settings, onboarding)
+        updateProfile: updateProfileLocal
     };
 }

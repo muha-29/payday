@@ -13,9 +13,7 @@ export default function PublicLayout() {
                     </h1>
 
                     <nav className="flex gap-6 text-white text-sm font-medium">
-                        <NavLink to="/" className="hover:underline">
-                            Home
-                        </NavLink>
+                        
                         <NavLink to="/Features" className="hover:underline">
                             Features
                         </NavLink>
