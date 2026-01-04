@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGoal } from '../api/savings';
+import { useI18n } from '../hooks/useI18n';
 
 export default function AddGoal() {
+    const { t } = useI18n();
     const [title, setTitle] = useState('');
     const [amount, setAmount] = useState('');
     const navigate = useNavigate();
@@ -19,12 +21,12 @@ export default function AddGoal() {
     return (
         <div className="px-4 pt-4">
             <h1 className="text-xl font-bold mb-4">
-                Create Savings Goal
+                {t('addEarning')}
             </h1>
 
             <input
                 className="w-full mb-3 p-3 rounded-xl border"
-                placeholder="Goal name"
+                placeholder={t('goalName')}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
             />
@@ -32,7 +34,7 @@ export default function AddGoal() {
             <input
                 type="number"
                 className="w-full mb-6 p-3 rounded-xl border"
-                placeholder="Target amount"
+                placeholder={t('targetAmount')}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
             />
@@ -44,7 +46,7 @@ export default function AddGoal() {
           bg-gradient-to-r from-orange-500 to-amber-500
         "
             >
-                Save Goal
+                {t('addEarning')}
             </button>
         </div>
     );

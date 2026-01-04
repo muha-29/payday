@@ -5,8 +5,11 @@ import {
   deleteIncome,
   Income
 } from '../../api/income';
+import { useI18n } from '../../hooks/useI18n';
+
 
 export default function Earnings() {
+  const { t } = useI18n();
   const [items, setItems] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -30,16 +33,16 @@ export default function Earnings() {
   return (
     <div className="relative px-4 pb-32">
       {/* Header */}
-      <h1 className="text-xl font-bold my-4">My Earnings 💵</h1>
+      <h1 className="text-xl font-bold my-4"> {t('myEarnings')} 💵</h1>
 
       {/* Content */}
       {loading && (
-        <div className="text-stone-400">Loading…</div>
+        <div className="text-stone-400">{t('loading')}…</div>
       )}
 
       {!loading && items.length === 0 && (
         <div className="text-stone-400">
-          No earnings yet. Add your first one.
+          {t('noEarningsYet')} {t('addYourFirstOne')}
         </div>
       )}
 

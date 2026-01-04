@@ -3,8 +3,11 @@ import { addIncome } from '../../api/income';
 import { useNavigate } from 'react-router-dom';
 import { speak } from '../../utils/speak';
 import { useProfile } from '../../hooks/useProfile';
+import { useI18n } from '../../hooks/useI18n';
+
 
 export default function AddIncome() {
+    const { t } = useI18n();
     const [amount, setAmount] = useState('');
     const navigate = useNavigate();
     const profile = useProfile().profile;
@@ -27,7 +30,7 @@ export default function AddIncome() {
 
     return (
         <div className="p-4">
-            <h1 className="text-xl font-bold mb-6">Add Earning 💰</h1>
+            <h1 className="text-xl font-bold mb-6"> {t('addEarning')} 💰</h1>
 
             <input
                 type="number"
@@ -42,7 +45,7 @@ export default function AddIncome() {
                 className="w-full py-3 rounded-xl text-white font-semibold
                    bg-gradient-to-r from-orange-500 to-amber-500"
             >
-                Save Earning
+                {t('saveEarning')}
             </button>
         </div>
     );

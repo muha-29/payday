@@ -7,6 +7,8 @@ import {
     User
 } from 'lucide-react';
 
+import { useI18n } from '../hooks/useI18n';
+
 const tabs = [
     { to: '/app/home', label: 'Home', Icon: Home },
     { to: '/app/earnings', label: 'Earnings', Icon: BarChart3 },
@@ -16,6 +18,7 @@ const tabs = [
 ];
 
 export default function BottomNav() {
+    const { t } = useI18n();
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t h-20 flex justify-around items-center">
             {tabs.map(({ to, label, Icon }) => (
@@ -30,7 +33,7 @@ export default function BottomNav() {
                     }
                 >
                     <Icon size={20} />
-                    <span>{label}</span>
+                    <span>{t(label)}</span>
                 </NavLink>
             ))}
         </nav>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { getDashboard as fetchDashboard } from '../api/dashboard';
 // import { useSession } from '@supabase/auth-helpers-react';
-
+import { useI18n } from '../hooks/useI18n';
 export default function Home() {
+    const { t } = useI18n();
     // const session = useSession();
     const [data, setData] = useState<any>(null);
 
@@ -31,12 +32,12 @@ export default function Home() {
         <div className="space-y-5 px-4 pb-24">
             {/* Earnings Card */}
             <div className="bg-white rounded-xl p-4 shadow">
-                <p className="text-gray-500 text-sm">Today’s Earnings</p>
+                <p className="text-gray-500 text-sm">{t('todayEarnings')}</p>
                 <h1 className="text-3xl font-bold">₹{data.today}</h1>
 
                 <div className="flex justify-between mt-2 text-sm">
-                    <span className="text-green-600">Saved ₹{data.savings}</span>
-                    <span className="text-red-500">Spent ₹0</span>
+                    <span className="text-green-600">{t('saved')} ₹{data.savings}</span>
+                    <span className="text-red-500">{t('spent')} ₹0</span>
                 </div>
             </div>
 
