@@ -15,6 +15,7 @@ const app = express();
 app.use(cors({
     origin: [
         'https://payday-xi.vercel.app',
+        'https://payday-879j.vercel.app',
         'http://localhost:3000'
     ],
     credentials: true
