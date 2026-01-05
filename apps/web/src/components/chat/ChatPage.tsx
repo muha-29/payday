@@ -1,0 +1,65 @@
+import { useState } from 'react';
+import { useVoice } from '../../hooks/useVoice';
+import { askAI } from '../../api/ai';
+import { useProfile } from '../../hooks/useProfile';
+
+export function ChatPage() {
+    const { profile } = useProfile();
+    const language = profile?.language || 'en-IN';
+
+    const [messages, setMessages] = useState<
+        { role: 'user' | 'ai'; text: string }[]
+    >([]);
+    const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const sendMessage = async (text: string) => {
+        if (!text.trim()) return;
+
+        setMessages(prev => [...prev, { role: 'user', text }]);
+        setLoading(true);
+
+        try {
+            const res = await askAI({ question: text, language });
+
+            setMessages(prev => [
+                ...prev,
+                { role: 'ai', text: res.answer }
+            ]);
+        } catch (err) {
+            setMessages(prev => [
+                ...prev,
+                { role: 'ai', text: 'Sorry, I could not help right now.' }
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const { start } = useVoice(language, sendMessage);
+
+    return (
+        <div className="chat-page">
+            <div className="messages">
+                {messages.map((m, i) => (
+                    <div key={i} className={`msg ${m.role}`}>
+                        {m.text}
+                    </div>
+                ))}
+                {loading && <div className="msg ai">Thinking…</div>}
+            </div>
+
+            <div className="chat-input">
+                <input
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    placeholder="Type in your language…"
+                    onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
+                />
+
+                <button onClick={() => sendMessage(input)}>Send</button>
+                <button onClick={start}>🎙️</button>
+            </div>
+        </div>
+    );
+}

@@ -9,6 +9,7 @@ import Profile from './pages/Profile/ProfileHome';
 import Login from './pages/Login';
 import AddGoal from './pages/AddGoal';
 import ChatHistory from './pages/Profile/ChatHistory';
+import { ChatPage } from './components/chat/ChatPage';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/add-goal" element={<AddGoal />} />
         <Route path="/app/profile/history" element={<ChatHistory />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="/app/chat" element={<ChatPage />} />
       </Route>
     </Routes>)
 }

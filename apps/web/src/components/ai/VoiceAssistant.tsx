@@ -38,7 +38,7 @@ export function VoiceAssistant() {
             setThinking(false);
         }
     };
-
+    console.log('Voice, language', language);
     const { start } = useVoice(language, handleSpeechResult);
 
     if (loading) return null;
@@ -74,16 +74,7 @@ export function VoiceAssistant() {
             {/* AI Reply Bubble */}
             {lastReply && !listening && (
                 <div
-                    className="
-            max-w-xs
-            bg-orange-50
-            border-l-4 border-orange-400
-            rounded-xl
-            p-3
-            text-sm
-            text-stone-700
-            shadow
-          "
+                    className="max-w-xs bg-orange-50 border-l-4 border-orange-400 rounded-xl p-3text-sm text-stone-700 shadow"
                 >
                     {lastReply}
                 </div>

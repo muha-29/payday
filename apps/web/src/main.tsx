@@ -26,6 +26,7 @@ import { Toaster } from 'react-hot-toast';
 import Learn from './pages/Learn';
 import { registerSW } from 'virtual:pwa-register';
 import ChatHistory from './pages/Profile/ChatHistory';
+import { ChatPage } from './components/chat/ChatPage';
 
 
 const router = createBrowserRouter([
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
             { path: 'profile', element: <Profile /> },
             { path: 'learn', element: <Learn /> },
             { path: 'profile/history', element: <ChatHistory /> },
+            { path: 'chat', element: <ChatPage /> }
         ]
     }
 ]);
