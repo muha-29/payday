@@ -6,6 +6,7 @@ import Earnings from './pages/Earnings/EarningsHome';
 import Savings from './pages/Savings/SavingsHome';
 import Profile from './pages/Profile/ProfileHome';
 import Onboarding from './pages/Onboarding';
+import AddIncome from './pages/Earnings/AddEarning';
 
 type RouterProps = {
     session: any;
@@ -25,6 +26,7 @@ export default function Router({ session }: RouterProps) {
                 <Route path="/earnings" element={<Earnings />} />
                 <Route path="/savings" element={<Savings />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/app/add-income" element={<AddIncome />} />
             </Route>
 
             {/* Fallback */}

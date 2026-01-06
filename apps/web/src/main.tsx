@@ -27,6 +27,8 @@ import Learn from './pages/Learn';
 import { registerSW } from 'virtual:pwa-register';
 import ChatHistory from './pages/Profile/ChatHistory';
 import { ChatPage } from './components/chat/ChatPage';
+import AddIncome from './pages/Earnings/AddEarning';
+import AddGoal from './pages/AddGoal';
 
 
 const router = createBrowserRouter([
@@ -57,7 +59,9 @@ const router = createBrowserRouter([
             { path: 'profile', element: <Profile /> },
             { path: 'learn', element: <Learn /> },
             { path: 'profile/history', element: <ChatHistory /> },
-            { path: 'chat', element: <ChatPage /> }
+            { path: 'chat', element: <ChatPage /> },
+            { path: 'add-income', element: <AddIncome /> },
+            { path: 'add-goal', element: <AddGoal /> }
         ]
     }
 ]);

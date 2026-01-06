@@ -73,7 +73,7 @@ export default function Earnings() {
 
       {/* Floating Add Button */}
       <button
-        onClick={() => navigate('/add-income')}
+        onClick={() => navigate('/app/add-income')}
         className="
           fixed bottom-20 right-5
           w-14 h-14 rounded-full

@@ -114,7 +114,7 @@ export default function Savings() {
 
       {/* Floating Add Goal Button */}
       <button
-        onClick={() => navigate('/add-goal')}
+        onClick={() => navigate('/app/add-goal')}
         className="
           fixed bottom-20 right-5
           w-14 h-14 rounded-full

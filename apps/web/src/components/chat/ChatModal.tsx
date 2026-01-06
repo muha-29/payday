@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { askAI } from '../../api/ai';
 import { useVoice } from '../../hooks/useVoice';
 import { ChatBubble } from './ChatBubble';
+import { useProfile } from '../../hooks/useProfile';
+
 
 type Message = {
     role: 'user' | 'ai';
     text: string;
     timestamp: number;
+    language?: string; // 🔥 only for AI
 };
 
 export function ChatModal({
@@ -16,6 +19,8 @@ export function ChatModal({
     onClose: () => void;
     language?: string;
 }) {
+    const { profile } = useProfile();
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -40,16 +45,16 @@ export function ChatModal({
         if (!text.trim() || loading) return;
         const now = Date.now();
 
-        setMessages(prev => [...prev, { role: 'user', text, timestamp: now }]);
+        setMessages(prev => [...prev, { role: 'user', text, timestamp: now, language  }]);
         setInput('');
         setLoading(true);
 
         try {
-            const res = await askAI({ question: text, language });
+            const res = await askAI({ question: text, language: profile?.language || 'en' });
 
             setMessages(prev => [
                 ...prev,
-                { role: 'ai', text: res.answer, timestamp: Date.now() }
+                { role: 'ai', text: res.answer, timestamp: Date.now(), language: 'en-IN' }
             ]);
         } catch (err) {
             setMessages(prev => [
@@ -57,7 +62,8 @@ export function ChatModal({
                 {
                     role: 'ai',
                     text: 'Sorry, I could not help right now.',
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    language: 'en-IN'
                 }
             ]);
         } finally {

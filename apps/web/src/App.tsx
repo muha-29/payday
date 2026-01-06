@@ -26,7 +26,7 @@ export default function App() {
       >
         <Route index element={<Home />} />
         <Route path="earnings" element={<Earnings />} />
-        <Route path="/add-income" element={<AddIncome />} />
+        <Route path="/app/add-income" element={<AddIncome />} />
 
         <Route path="savings" element={<Savings />} />
         <Route path="/add-goal" element={<AddGoal />} />

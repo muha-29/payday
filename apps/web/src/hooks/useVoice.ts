@@ -1,6 +1,6 @@
 export function useVoice(
     language: string,
-    onResult: (text: string) => void
+    onFinalResult: (text: string) => void
 ) {
     const start = () => {
         const SpeechRecognition =
@@ -15,8 +15,8 @@ export function useVoice(
         const recognition = new SpeechRecognition();
 
         recognition.lang = language;
-        recognition.continuous = false;
-        recognition.interimResults = true; // 🔥 IMPORTANT
+        recognition.continuous = true;        // 🔥 keep listening
+        recognition.interimResults = true;    // 🔥 capture partials
         recognition.maxAlternatives = 1;
 
         recognition.onstart = () => {
@@ -24,17 +24,32 @@ export function useVoice(
         };
 
         recognition.onresult = (event: any) => {
-            const text = event.results[0][0].transcript;
-            console.log('🎙️ Voice captured:', text);
-            onResult(text);
+            let finalTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                if (result.isFinal) {
+                    finalTranscript += result[0].transcript;
+                }
+            }
+
+            if (finalTranscript.trim()) {
+                console.log('🎙️ Final voice captured:', finalTranscript);
+                recognition.stop(); // 🔥 stop manually
+                onFinalResult(finalTranscript.trim());
+            }
         };
 
         recognition.onerror = (err: any) => {
             if (err.error === 'no-speech') {
-                console.warn('⚠️ No speech detected. Please speak louder or sooner.');
+                console.warn('⚠️ No speech detected');
                 return;
             }
             console.error('Voice error:', err);
+        };
+
+        recognition.onend = () => {
+            console.log('🛑 Mic stopped');
         };
 
         recognition.start();

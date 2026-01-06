@@ -3,6 +3,8 @@ import { detectIntent } from '../utils/detectIntent.js';
 import { buildContext } from '../utils/buildContext.js';
 import { runAI } from '../services/ai.service.js';
 import { generateSpeech } from '../services/tts.service.js';
+import { normalizeSpeechText } from '../utils/normalizeSpeechText.js';
+
 
 /**
  * POST /api/ai/ask
@@ -21,6 +23,7 @@ export async function askAI(req, res) {
     let answer = '';
     let audioUrl = null;
     let intent = 'unknown';
+    const normalizedQuestion = normalizeSpeechText(question, language);
 
     try {
         // 1️⃣ Detect intent
@@ -31,7 +34,7 @@ export async function askAI(req, res) {
 
         // 3️⃣ Run AI (TEXT ONLY — must never fail silently)
         answer = await runAI({
-            question,
+            question : normalizedQuestion,
             context,
             language
         });

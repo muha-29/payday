@@ -35,6 +35,7 @@ export default function AppLayout() {
                         console.log('❌ Chat closed');
                         setIsChatOpen(false);
                     }}
+                    
                 />
             )}
         </div>
