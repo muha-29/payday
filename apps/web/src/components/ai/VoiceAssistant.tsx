@@ -1,84 +1,136 @@
-import { useState } from 'react';
-import { useVoice } from '../../hooks/useVoice';
-import { speak } from '../../utils/speak';
-import { askAI } from '../../api/ai';
-import { useProfile } from '../../hooks/useProfile';
+import { useRef, useState } from "react";
+import { floatTo16BitPCM, downsampleBuffer } from "../../utils/audio";
+
+type TranscriptMsg = {
+    type: "partial_transcript" | "final_transcript";
+    text: string;
+};
 
 export function VoiceAssistant() {
-    const { profile, loading } = useProfile();
+    const wsRef = useRef<WebSocket | null>(null);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const processorRef = useRef<ScriptProcessorNode | null>(null);
+    const mediaStreamRef = useRef<MediaStream | null>(null);
 
     const [listening, setListening] = useState(false);
-    const [lastReply, setLastReply] = useState<string | null>(null);
-    const [thinking, setThinking] = useState(false);
+    const [partialText, setPartialText] = useState("");
+    const [finalText, setFinalText] = useState("");
 
-    const language = profile?.language || 'te-IN';
+    /* ---------------- WS ---------------- */
 
-    /**
-     * Callback executed AFTER speech → text
-     */
-    const handleSpeechResult = async (text: string) => {
-        setListening(false);
-        setThinking(true);
+    const initWebSocket = () => {
+        const ws = new WebSocket("ws://localhost:4000/voice");
+        ws.binaryType = "arraybuffer";
 
-        try {
-            const res = await askAI({
-                question: text,
-                language
-            });
+        ws.onopen = () => {
+            console.log("WS connected");
+        };
 
-            setLastReply(res.answer);          // ✅ UI state
-            speak(res.answer, language);       // ✅ Voice output
-        } catch (err) {
-            const fallback =
-                'Sorry, I could not help right now. Please try again.';
+        ws.onmessage = (event) => {
+            const data: TranscriptMsg = JSON.parse(event.data);
 
-            setLastReply(fallback);
-            speak(fallback, language);
-        } finally {
-            setThinking(false);
-        }
+            if (data.type === "partial_transcript") {
+                setPartialText(data.text);
+            }
+
+            if (data.type === "final_transcript") {
+                setFinalText((prev) => prev + " " + data.text);
+                setPartialText("");
+            }
+        };
+
+        ws.onerror = (err) => {
+            console.error("WS error", err);
+        };
+
+        ws.onclose = () => {
+            console.log("WS closed");
+        };
+
+        wsRef.current = ws;
     };
-    console.log('Voice, language', language);
-    const { start } = useVoice(language, handleSpeechResult);
 
-    if (loading) return null;
+    /* ---------------- AUDIO ---------------- */
+
+    const startAudioStream = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
+
+        const audioContext = new AudioContext({ sampleRate: 48000 });
+        audioContextRef.current = audioContext;
+
+        const source = audioContext.createMediaStreamSource(stream);
+        const processor = audioContext.createScriptProcessor(4096, 1, 1);
+        processorRef.current = processor;
+
+        source.connect(processor);
+        processor.connect(audioContext.destination);
+
+        processor.onaudioprocess = (event) => {
+            const ws = wsRef.current;
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+            const input = event.inputBuffer.getChannelData(0);
+
+            const downsampled = downsampleBuffer(
+                input,
+                audioContext.sampleRate,
+                16000
+            );
+
+            const pcm16 = floatTo16BitPCM(downsampled);
+            ws.send(pcm16);
+        };
+    };
+
+    /* ---------------- CONTROLS ---------------- */
+
+    const startListening = async () => {
+        if (listening) return;
+
+        setFinalText("");
+        setPartialText("");
+
+        initWebSocket();
+        await startAudioStream();
+
+        setListening(true);
+    };
+
+    const stopListening = () => {
+        processorRef.current?.disconnect();
+        audioContextRef.current?.close();
+        mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
+        wsRef.current?.close();
+
+        processorRef.current = null;
+        audioContextRef.current = null;
+        mediaStreamRef.current = null;
+        wsRef.current = null;
+
+        setListening(false);
+    };
+
+    /* ---------------- UI ---------------- */
 
     return (
-        <div className="relative flex flex-col items-center gap-2">
-            {/* Voice Button */}
-            <button
-                onClick={() => {
-                    setListening(true);
-                    start();
-                }}
-                aria-label="Talk to PayDay"
-                className="w-14 h-14 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xl shadow-xl active:scale-95flex items-center justify-center"
-            >
-                🎤
-            </button>
+        <div style={{ padding: 16 }}>
+            <div style={{ marginBottom: 12 }}>
+                <button onClick={startListening} disabled={listening}>
+                    Start
+                </button>
+                <button onClick={stopListening} disabled={!listening}>
+                    Stop
+                </button>
+            </div>
 
-            {/* Listening animation */}
-            {listening && (
-                <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" />
-                    <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce delay-100" />
-                    <span className="w-2 h-2 bg-orange-300 rounded-full animate-bounce delay-200" />
-                </div>
-            )}
+            <div>
+                <strong>Live:</strong> {partialText}
+            </div>
 
-            {/* Thinking indicator */}
-            {thinking && (
-                <p className="text-xs text-stone-400">PayDay is thinking…</p>
-            )}
-
-            {/* AI Reply Bubble */}
-            {lastReply && !listening && (
-                <div
-                    className="max-w-xs bg-orange-50 border-l-4 border-orange-400 rounded-xl p-3text-sm text-stone-700 shadow"
-                >
-                    {lastReply}
-                </div>
-            )}
+            <div style={{ marginTop: 8 }}>
+                <strong>Final:</strong> {finalText}
+            </div>
         </div>
     );
 }
