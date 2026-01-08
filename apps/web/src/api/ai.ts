@@ -1,13 +1,18 @@
 import { apiFetch } from './api';
 
-export async function askAI(data: {
+export async function askAI({
+    native,
+    question,
+    language
+}: {
+    native: string;
     question: string;
     language: string;
 }) {
-    console.log('💬 Asking AI:', data.question, 'in', data.language);
+    console.log('💬 Asking AI:', question, 'in', language);
     return apiFetch('/ai/ask', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify({native ,english : question, targetLanguage : language, language : 'en-IN'})
     });
 }
 

@@ -1,59 +1,83 @@
+import { useRef } from "react";
+
+export type VoiceResult = {
+  transcript: string; // native language
+  english: string;    // translated English
+  language: string;
+};
+
 export function useVoice(
-    language: string,
-    onFinalResult: (text: string) => void
+  onFinalResult: (result: VoiceResult) => void
 ) {
-    const start = () => {
-        const SpeechRecognition =
-            (window as any).SpeechRecognition ||
-            (window as any).webkitSpeechRecognition;
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
 
-        if (!SpeechRecognition) {
-            alert('Speech recognition not supported');
-            return;
+  const start = async () => {
+    try {
+      console.log("🎤 Starting Sarvam voice capture");
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+
+      chunksRef.current = [];
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
         }
+      };
 
-        const recognition = new SpeechRecognition();
+      recorder.onstop = async () => {
+        console.log("🛑 Mic stopped, sending to Sarvam STT");
 
-        recognition.lang = language;
-        recognition.continuous = true;        // 🔥 keep listening
-        recognition.interimResults = true;    // 🔥 capture partials
-        recognition.maxAlternatives = 1;
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
 
-        recognition.onstart = () => {
-            console.log('🎤 Mic listening...');
-        };
+        const fd = new FormData();
+        fd.append("audio", blob);
 
-        recognition.onresult = (event: any) => {
-            let finalTranscript = '';
+        try {
+          const res = await fetch("http://localhost:4000/stt", {
+            method: "POST",
+            body: fd,
+          });
 
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const result = event.results[i];
-                if (result.isFinal) {
-                    finalTranscript += result[0].transcript;
-                }
-            }
+          if (!res.ok) {
+            throw new Error("STT request failed");
+          }
 
-            if (finalTranscript.trim()) {
-                console.log('🎙️ Final voice captured:', finalTranscript);
-                recognition.stop(); // 🔥 stop manually
-                onFinalResult(finalTranscript.trim());
-            }
-        };
+          const json = await res.json();
+          const data = json.data;
 
-        recognition.onerror = (err: any) => {
-            if (err.error === 'no-speech') {
-                console.warn('⚠️ No speech detected');
-                return;
-            }
-            console.error('Voice error:', err);
-        };
+          if (!data?.transcript) {
+            console.warn("⚠️ Empty STT result");
+            return;
+          }
 
-        recognition.onend = () => {
-            console.log('🛑 Mic stopped');
-        };
+          const result: VoiceResult = {
+            transcript: data.transcript,
+            english: data.english || data.transcript,
+            language: data.language || "unknown",
+          };
 
-        recognition.start();
-    };
+          console.log("🎙️ Voice result:", result);
 
-    return { start };
+          onFinalResult(result);
+        } catch (err) {
+          console.error("❌ Sarvam STT failed", err);
+        } finally {
+          stream.getTracks().forEach((t) => t.stop());
+        }
+      };
+
+      recorder.start();
+
+      // ⏱️ Fixed capture window (POC-safe)
+      setTimeout(() => recorder.stop(), 4000);
+    } catch (err) {
+      console.error("❌ Mic error", err);
+    }
+  };
+
+  return { start };
 }

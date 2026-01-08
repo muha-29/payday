@@ -31,14 +31,14 @@ export default function ChatHistory() {
                     </p>
 
                     <p className="mt-2 font-medium">
-                        🧑 {c.input.text}
+                        🧑 {c.input?.text || c.question}
                     </p>
 
                     <p className="mt-2 text-orange-600">
-                        🤖 {c.output.text}
+                        🤖 {c.output?.text || c.answer}
                     </p>
 
-                    {c.output.audioUrl && (
+                    {c.output?.audioUrl && (
                         <audio
                             className="mt-2 w-full"
                             controls
