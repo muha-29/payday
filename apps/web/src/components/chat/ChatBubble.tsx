@@ -62,7 +62,8 @@ export function ChatBubble({
                 {/* 🔊 TTS */}
                 {audioUrl && (
                     <button
-                        onClick={() => new Audio(audioUrl).play()}
+                        // onClick={() => new Audio(audioUrl).play()}
+                        onClick={()=>{speak(text, language || "en-IN");}}
                         title="Listen"
                     >
                         🔊

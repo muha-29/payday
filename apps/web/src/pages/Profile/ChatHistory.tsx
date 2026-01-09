@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchChatHistory } from '../../api/ai';
+import { speak } from "../../utils/speak";
 
 export default function ChatHistory() {
     const [items, setItems] = useState<any[]>([]);
@@ -14,6 +15,13 @@ export default function ChatHistory() {
     if (loading) {
         return <div className="p-4">Loading…</div>;
     }
+    const handleSpeak = (c : any) => {
+        if (c.audioUrl) {
+            new Audio(c.audioUrl).play();
+        } else {
+            speak(c.output?.text || c.answer, c.output?.language || "en-IN"); // fallback only
+        }
+    };
 
     return (
         <div className="p-4 space-y-4">
@@ -37,6 +45,15 @@ export default function ChatHistory() {
                     <p className="mt-2 text-orange-600">
                         🤖 {c.output?.text || c.answer}
                     </p>
+
+                    <button
+                        // onClick={() => new Audio(audioUrl).play()}
+                        // onClick={() => { speak(c.output?.text || c.answer, c.output?.language || "en-IN"); }}
+                        onClick={() => { handleSpeak(c) }}
+                        title="Listen"
+                    >
+                        🔊
+                    </button>
 
                     {c.output?.audioUrl && (
                         <audio
