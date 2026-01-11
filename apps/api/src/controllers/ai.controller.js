@@ -4,76 +4,100 @@ import { buildContext } from '../utils/buildContext.js';
 import { runAI } from '../services/ai.service.js';
 import { generateSpeech } from '../services/tts.service.js';
 import { normalizeSpeechText } from '../utils/normalizeSpeechText.js';
-
+import { translateFromEnglish } from '../services/sarvam.translate.fromEnglish.js';
 
 /**
  * POST /api/ai/ask
- * Body: { question: string, language?: string }
+ * Body:
+ * {
+ *   native: string,        // user language
+ *   english: string,       // translated English (for LLM)
+ *   language: string       // hi-IN, te-IN, etc
+ * }
  */
 export async function askAI(req, res) {
     const userId = req.user?.id;
-    const { question, language = 'en' } = req.body;
 
-    if (!question || !userId) {
-        return res.status(400).json({
-            error: 'Invalid request'
-        });
+    const {
+        native,
+        english,
+        language = 'en-IN',
+        targetLanguage = 'en-IN'
+    } = req.body;
+
+    if (!userId || !english) {
+        return res.status(400).json({ error: 'Invalid request' });
     }
 
-    let answer = '';
+    let aiEnglishAnswer = '';
+    let aiNativeAnswer = '';
     let audioUrl = null;
     let intent = 'unknown';
-    const normalizedQuestion = normalizeSpeechText(question, language);
 
     try {
-        // 1️⃣ Detect intent
-        intent = detectIntent(question);
+        /* ---------- 1️⃣ Detect intent (English-safe) ---------- */
+        intent = detectIntent(english);
 
-        // 2️⃣ Build user-specific context
+        /* ---------- 2️⃣ Build context ---------- */
         const context = await buildContext(userId, intent);
 
-        // 3️⃣ Run AI (TEXT ONLY — must never fail silently)
-        answer = await runAI({
-            question : normalizedQuestion,
+        /* ---------- 3️⃣ Normalize English ---------- */
+        const normalizedEnglish = normalizeSpeechText(english, 'en-IN');
+
+        /* ---------- 4️⃣ Run AI (ENGLISH ONLY) ---------- */
+        aiEnglishAnswer = await runAI({
+            question: normalizedEnglish,
             context,
-            language
+            language: 'en-IN'   // 🔒 ALWAYS ENGLISH
         });
+
+        /* ---------- 5️⃣ Translate AI → native ---------- */
+        console.log('🌐 Translating AI answer to', targetLanguage);
+        if (targetLanguage !== 'en-IN') {
+            aiNativeAnswer = await translateFromEnglish(
+                aiEnglishAnswer,
+                targetLanguage
+            );
+        } else {
+            aiNativeAnswer = aiEnglishAnswer;
+        }
+
     } catch (err) {
         console.error('[AI ERROR]', err);
-        return res.status(500).json({
-            error: 'AI processing failed'
-        });
+        return res.status(500).json({ error: 'AI processing failed' });
     }
 
-    // 4️⃣ Try TTS (NON-BLOCKING, OPTIONAL)
+    /* ---------- 6️⃣ Optional TTS (native) ---------- */
     try {
-        const ttsResult = await generateSpeech(answer, language);
+        const ttsResult = await generateSpeech(aiEnglishAnswer, targetLanguage);
 
         if (ttsResult?.filename) {
             audioUrl = `/audio/${ttsResult.filename}`;
         }
     } catch (err) {
-        // 🔥 DO NOT CRASH — TTS IS OPTIONAL
         console.warn('[TTS FAILED]', err.message);
     }
 
-    // 5️⃣ Persist conversation (best-effort)
+    /* ---------- 7️⃣ Persist conversation ---------- */
     try {
         await VoiceConversation.create({
             userId,
-            question,
-            answer,
-            language,
+            question: native,              // native user text
+            questionEnglish: english,      // 🔥 store English
+            answer: aiNativeAnswer,        // native AI
+            answerEnglish: aiEnglishAnswer,// 🔥 store English
+            language : targetLanguage,
             intent
         });
     } catch (err) {
         console.warn('[DB WRITE FAILED]', err.message);
-        // Do NOT block response
     }
 
-    // 6️⃣ Always respond
+    /* ---------- 8️⃣ Respond ---------- */
     return res.json({
-        answer,
+        text: aiNativeAnswer,        // native (UI)
+        english: aiEnglishAnswer,    // English (ℹ️)
+        lang : targetLanguage,
         audioUrl
     });
 }

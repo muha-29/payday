@@ -1,5 +1,10 @@
+import express from "express";
+import multer from "multer";
 import { transcribe } from "../services/sarvam.stt.js";
-import { translateToEnglish } from "../services/sarvam.translate.js";
+import { translateToEnglish } from "../src/services/sarvam.translate.js";
+
+const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/", upload.single("audio"), async (req, res) => {
   try {
@@ -21,3 +26,5 @@ router.post("/", upload.single("audio"), async (req, res) => {
     res.status(500).json({ error: "STT failed" });
   }
 });
+
+export default router;
