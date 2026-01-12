@@ -1,4 +1,5 @@
 import { useRef } from "react";
+const domain = import.meta.env.VITE_API_DOMAIN || 'http://localhost:4000';
 
 export type VoiceResult = {
   transcript: string; // native language
@@ -37,7 +38,7 @@ export function useVoice(
         fd.append("audio", blob);
 
         try {
-          const res = await fetch("http://localhost:4000/stt", {
+          const res = await fetch(`${domain}/stt`, {
             method: "POST",
             body: fd,
           });
