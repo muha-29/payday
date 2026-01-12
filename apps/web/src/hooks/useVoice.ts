@@ -1,5 +1,5 @@
 import { useRef } from "react";
-const domain = 'https://payday-api.onrender.com';
+const domain = 'https://payday-api.onrender.com/api';
 
 export type VoiceResult = {
   transcript: string; // native language
