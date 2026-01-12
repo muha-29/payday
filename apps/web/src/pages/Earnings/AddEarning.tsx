@@ -20,12 +20,12 @@ export default function AddIncome() {
         });
         console.log('profile', profile)
         console.log('profile.language:', profile.language);
-        speak(
-            `₹${amount} added to your earnings`,
-            profile.language
-        );
+        // speak(
+        //     `₹${amount} added to your earnings`,
+        //     profile.language
+        // );
 
-        navigate('/earnings');
+        navigate('/app/earnings');
     }
 
     return (
