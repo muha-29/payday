@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchChatHistory } from '../../api/ai';
 import { speak } from "../../utils/speak";
 
-const domain = import.meta.env.VITE_API_DOMAIN || 'http://localhost:4000';
+const domain = 'https://payday-api.onrender.com';
 export default function ChatHistory() {
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);

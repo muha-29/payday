@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { speak } from "../../utils/speak";
-const domain = import.meta.env.VITE_API_DOMAIN || 'http://localhost:4000';
+const domain = 'https://payday-api.onrender.com';
 
 type ChatBubbleProps = {
     role: "user" | "ai";
