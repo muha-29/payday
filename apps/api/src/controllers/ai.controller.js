@@ -69,7 +69,7 @@ export async function askAI(req, res) {
 
     /* ---------- 6️⃣ Optional TTS (native) ---------- */
     try {
-        const ttsResult = await generateSpeech(aiEnglishAnswer, targetLanguage);
+        const ttsResult = await generateSpeech(aiNativeAnswer, targetLanguage);
 
         if (ttsResult?.filename) {
             audioUrl = `/audio/${ttsResult.filename}`;
@@ -87,7 +87,9 @@ export async function askAI(req, res) {
             answer: aiNativeAnswer,        // native AI
             answerEnglish: aiEnglishAnswer,// 🔥 store English
             language : targetLanguage,
-            intent
+            intent,
+            audioUrl,
+            ttsLanguage: targetLanguage,
         });
     } catch (err) {
         console.warn('[DB WRITE FAILED]', err.message);

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { speak } from "../../utils/speak";
+const domain = import.meta.env.VITE_API_DOMAIN || 'http://localhost:4000';
 
 type ChatBubbleProps = {
     role: "user" | "ai";
@@ -62,12 +63,16 @@ export function ChatBubble({
                 {/* 🔊 TTS */}
                 {audioUrl && (
                     <button
-                        // onClick={() => new Audio(audioUrl).play()}
-                        onClick={()=>{speak(text, language || "en-IN");}}
+                        onClick={() => new Audio(audioUrl).play()}
+                        // onClick={()=>{speak(text, language || "en-IN");}}
                         title="Listen"
                     >
-                        🔊
-                    </button>
+                        <audio
+                            src={domain+audioUrl}
+                            controls
+                            preload="none"
+                            className="mt-1"
+                        />                    </button>
                 )}
 
                 {/* ℹ️ English toggle (AI only, if exists) */}
