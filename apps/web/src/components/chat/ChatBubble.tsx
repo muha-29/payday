@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { speak } from "../../utils/speak";
-const domain = 'https://payday-api.onrender.com/api';
+const domain = 'https://payday-api.onrender.com';
 
 type ChatBubbleProps = {
     role: "user" | "ai";
