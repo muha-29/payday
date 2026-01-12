@@ -1,5 +1,5 @@
 import { useRef } from "react";
-const domain = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+const domain = 'https://payday-api.onrender.com';
 
 export type VoiceResult = {
   transcript: string; // native language
