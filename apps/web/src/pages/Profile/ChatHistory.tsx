@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchChatHistory } from '../../api/ai';
 import { speak } from "../../utils/speak";
 
+const domain = import.meta.env.VITE_API_DOMAIN || 'http://localhost:4000';
 export default function ChatHistory() {
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -15,8 +16,9 @@ export default function ChatHistory() {
     if (loading) {
         return <div className="p-4">Loading…</div>;
     }
-    const handleSpeak = (c : any) => {
+    const handleSpeak = (c: any) => {
         if (c.audioUrl) {
+            console.log("Playing audio from URL:", c.audioUrl);
             new Audio(c.audioUrl).play();
         } else {
             speak(c.output?.text || c.answer, c.output?.language || "en-IN"); // fallback only
@@ -49,10 +51,18 @@ export default function ChatHistory() {
                     <button
                         // onClick={() => new Audio(audioUrl).play()}
                         // onClick={() => { speak(c.output?.text || c.answer, c.output?.language || "en-IN"); }}
-                        onClick={() => { handleSpeak(c) }}
+                        // onClick={() => { handleSpeak(c) }}
                         title="Listen"
                     >
-                        🔊
+                        {c.audioUrl && (
+                            <audio
+                                src={domain+c.audioUrl}
+                                controls
+                                preload="none"
+                                className="mt-1"
+                            />
+                        )}
+
                     </button>
 
                     {c.output?.audioUrl && (

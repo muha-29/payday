@@ -1,53 +1,26 @@
 import mongoose from 'mongoose';
 
-const VoiceConversationSchema = new mongoose.Schema(
-    {
-        userId: {
-            type: String,
-            required: true,
-            index: true
-        },
+const VoiceConversationSchema = new mongoose.Schema({
+    userId: String,
 
-        question: {
-            type: String,
-            required: true,
-            trim: true
-        },
+    // USER
+    question: String,            // native user text
+    englishQuestion: String,     // English sent to LLM
 
-        answer: {
-            type: String,
-            required: true,
-            trim: true
-        },
+    // AI
+    answer: String,              // native AI text
+    englishAnswer: String,       // English from LLM
 
-        language: {
-            type: String,
-            default: 'en-IN'
-        },
+    language: String,            // user language (ta-IN, te-IN)
+    intent: String,
+    source: String,
 
-        intent: {
-            type: String,
-            enum: [
-                'dashboard',
-                'income',
-                'savings',
-                'goal',
-                'general',
-                'unknown'
-            ],
-            default: 'general'
-        },
+    // 🔊 AUDIO
+    audioUrl: String,            // <-- THIS WAS MISSING
+    ttsLanguage: String,         // optional but useful
 
-        source: {
-            type: String,
-            enum: ['voice', 'text'],
-            default: 'voice'
-        }
-    },
-    {
-        timestamps: true
-    }
-);
+}, { timestamps: true });
+
 
 export default mongoose.model(
     'VoiceConversation',
