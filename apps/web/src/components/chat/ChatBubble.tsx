@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
-import { speak } from "../../utils/speak";
-const domain = 'https://payday-api.onrender.com';
+import { apiFetch } from "../../api/api";
+import { StarRating } from "./rating";
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 type ChatBubbleProps = {
     role: "user" | "ai";
@@ -9,6 +10,8 @@ type ChatBubbleProps = {
     timestamp: number;
     language?: string;
     audioUrl?: string;
+    rating?: number | null;
+    id?: string;
 };
 
 export function ChatBubble({
@@ -17,10 +20,13 @@ export function ChatBubble({
     english,
     timestamp,
     language,
-    audioUrl
+    audioUrl,
+    rating,
+    id
 }: ChatBubbleProps) {
     const isUser = role === "user";
     const [showEnglish, setShowEnglish] = useState(false);
+    const [localRating, setLocalRating] = useState<number | null>(rating || null);
     const isSpeakingRef = useRef(false);
 
     const time = new Date(timestamp).toLocaleTimeString([], {
@@ -28,18 +34,30 @@ export function ChatBubble({
         minute: "2-digit"
     });
 
-    /* ---------- 🔊 Speak (AI only, optional) ---------- */
-    const handleSpeak = () => {
-        if (isSpeakingRef.current) return;
+    /* ---------- Rating handler ---------- */
+    const handleRate = async (value: number) => {
+        if (!id || localRating != null) return;
 
-        isSpeakingRef.current = true;
-        speak(text, language || "en-IN");
+        setLocalRating(value); // ⭐ optimistic UI
 
-        setTimeout(() => {
-            isSpeakingRef.current = false;
-        }, Math.max(2000, text.length * 60));
+        try {
+            await apiFetch("/ai/chat/rate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    messageId: id,
+                    rating: value
+                })
+            });
+        } catch (err) {
+            console.error("Rating failed", err);
+            setLocalRating(null); // rollback if needed
+        }
     };
 
+
+    console.log('ChatBubble render:', { id, role, rating, audioUrl });
     return (
         <div
             className={`flex flex-col ${isUser ? "items-end" : "items-start"
@@ -68,12 +86,22 @@ export function ChatBubble({
                         title="Listen"
                     >
                         <audio
-                            src={domain+audioUrl}
+                            src={`${API_URL}${audioUrl}`}
                             controls
                             preload="none"
                             className="mt-1"
                         />                    </button>
+
                 )}
+                {role === "ai" && id && (
+                    console.log('Rating value:', id, rating),
+                    <StarRating
+                        value={localRating}
+                        readonly={localRating != null}
+                        onRate={handleRate}
+                    />
+                )}
+
 
                 {/* ℹ️ English toggle (AI only, if exists) */}
                 {!isUser && english && (

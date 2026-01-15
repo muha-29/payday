@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
-import { fetchChatHistory } from '../../api/ai';
-import { speak } from "../../utils/speak";
+import { useEffect, useState } from "react";
+import { fetchChatHistory } from "../../api/ai";
+import { apiFetch } from "../../api/api";
+import { StarRating } from "../../components/chat/rating";
 
-const domain = 'https://payday-api.onrender.com';
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default function ChatHistory() {
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -13,17 +15,32 @@ export default function ChatHistory() {
             .finally(() => setLoading(false));
     }, []);
 
+    const handleRate = async (id: string, value: number) => {
+        // optimistic update
+        setItems(prev =>
+            prev.map(item =>
+                item._id === id ? { ...item, rating: value } : item
+            )
+        );
+
+        try {
+            await apiFetch("/ai/chat/rate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    messageId: id,
+                    rating: value
+                })
+            });
+        } catch (err) {
+            console.error("Rating failed", err);
+        }
+    };
+
     if (loading) {
         return <div className="p-4">Loading…</div>;
     }
-    const handleSpeak = (c: any) => {
-        if (c.audioUrl) {
-            console.log("Playing audio from URL:", c.audioUrl);
-            new Audio(c.audioUrl).play();
-        } else {
-            speak(c.output?.text || c.answer, c.output?.language || "en-IN"); // fallback only
-        }
-    };
 
     return (
         <div className="p-4 space-y-4">
@@ -34,44 +51,39 @@ export default function ChatHistory() {
             {items.map((c) => (
                 <div
                     key={c._id}
-                    className="bg-white p-4 rounded-xl shadow"
+                    className="bg-white p-4 rounded-xl shadow space-y-2"
                 >
+                    {/* Timestamp */}
                     <p className="text-xs text-stone-400">
                         {new Date(c.createdAt).toLocaleString()}
                     </p>
 
-                    <p className="mt-2 font-medium">
-                        🧑 {c.input?.text || c.question}
+                    {/* User message */}
+                    <p className="font-medium">
+                        🧑 {c.question}
                     </p>
 
-                    <p className="mt-2 text-orange-600">
-                        🤖 {c.output?.text || c.answer}
+                    {/* AI message */}
+                    <p className="text-orange-600">
+                        🤖 {c.answer}
                     </p>
 
-                    <button
-                        // onClick={() => new Audio(audioUrl).play()}
-                        // onClick={() => { speak(c.output?.text || c.answer, c.output?.language || "en-IN"); }}
-                        // onClick={() => { handleSpeak(c) }}
-                        title="Listen"
-                    >
-                        {c.audioUrl && (
-                            <audio
-                                src={domain+c.audioUrl}
-                                controls
-                                preload="none"
-                                className="mt-1"
-                            />
-                        )}
-
-                    </button>
-
-                    {c.output?.audioUrl && (
+                    {/* Audio */}
+                    {c.audioUrl && (
                         <audio
-                            className="mt-2 w-full"
+                            className="w-full mt-1"
                             controls
-                            src={c.output.audioUrl}
+                            preload="none"
+                            src={`${API_URL}${c.audioUrl}`}
                         />
                     )}
+
+                    {/* ⭐ Rating */}
+                    <StarRating
+                        value={c.rating ?? null}
+                        readonly={c.rating != null}
+                        onRate={(v) => handleRate(c._id, v)}
+                    />
                 </div>
             ))}
         </div>

@@ -131,6 +131,7 @@ export function ChatModal({
                 english: englishText,
                 language: lang,
                 timestamp: now,
+                id : 'temp-' + now,
             },
         ]);
 
@@ -143,7 +144,7 @@ export function ChatModal({
                 question: englishText,
                 language: lang,
             });
-
+            console.log('AI Response:', res);
             setMessages(prev => [
                 ...prev,
                 {
@@ -153,6 +154,7 @@ export function ChatModal({
                     audioUrl: res.audioUrl,
                     language: lang,
                     timestamp: Date.now(),
+                    id: res.id,
                 },
             ]);
         } catch (err) {
@@ -163,6 +165,7 @@ export function ChatModal({
                     role: "ai",
                     text: "Sorry, I could not help right now.",
                     timestamp: Date.now(),
+                    id : '1',
                 },
             ]);
         } finally {
@@ -236,6 +239,7 @@ export function ChatModal({
                             audioUrl={m.audioUrl}
                             timestamp={m.timestamp}
                             language={m.language}
+                            id={m.id}
                         />
                     ))}
 
