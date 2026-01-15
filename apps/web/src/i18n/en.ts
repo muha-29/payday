@@ -24,4 +24,6 @@ export default {
     GoodMorning: 'Good Morning',
     GoodAfternoon: 'Good Afternoon',
     GoodEvening: 'Good Evening',
+    AMA: 'Ask Me Anything',
+    LEM : 'Load Earlier Messages',
 };

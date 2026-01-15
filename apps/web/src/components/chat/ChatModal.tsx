@@ -3,10 +3,12 @@ import { askAI } from "../../api/ai";
 import { useVoice } from "../../hooks/useVoice";
 import { ChatBubble } from "./ChatBubble";
 import { useProfile } from "../../hooks/useProfile";
-
+import { useI18n } from '../../hooks/useI18n';
+import { fetchChatHistory } from '../../api/ai';
 /* ---------- Types ---------- */
 
 type Message = {
+    id?: string;
     role: "user" | "ai";
     text: string;
     english?: string;
@@ -22,6 +24,7 @@ export function ChatModal({
     onClose: () => void;
     language?: string;
 }) {
+    const { t } = useI18n();
     const { profile } = useProfile();
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -30,6 +33,12 @@ export function ChatModal({
 
     const bodyRef = useRef<HTMLDivElement | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
+
+    const [cursor, setCursor] = useState<number | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+    const [oldCHats, setOldChats] = useState<any[]>([]);
+
 
     /* ---------- Auto focus & scroll ---------- */
 
@@ -44,7 +53,66 @@ export function ChatModal({
         });
     }, [messages, loading]);
 
+    useEffect(() => {
+        // loadLatestHistory();
+    }, []);
+
     /* ---------- Unified Send ---------- */
+    const loadLatestHistory = async () => {
+        setLoadingHistory(true);
+
+        const res = await fetch("/api/ai/history?limit=20", {
+            credentials: "include",
+        });
+        const data = await res.json();
+
+        const mapped = data.items.map(mapServerMessage);
+
+        setMessages(mapped.reverse()); // 👈 oldest → newest for UI
+        setCursor(data.nextCursor ? new Date(data.nextCursor).getTime() : null);
+        setHasMore(!!data.nextCursor);
+        setLoadingHistory(false);
+    };
+
+    const handleScroll = async () => {
+        if (!bodyRef.current || loadingHistory || !hasMore) return;
+
+        if (bodyRef.current.scrollTop < 80) {
+            await loadOlderMessages();
+        }
+    };
+
+    const loadOlderMessages = async () => {
+        if (!cursor) return;
+
+        setLoadingHistory(true);
+
+        const res = await fetch(
+            `/api/chat/history?cursor=${cursor}&limit=20`,
+            { credentials: "include" }
+        );
+
+        const data = await res.json();
+        const older = data.items.map(mapServerMessage);
+
+        setMessages(prev => [...older.reverse(), ...prev]);
+        setCursor(data.nextCursor ? new Date(data.nextCursor).getTime() : null);
+        setHasMore(!!data.nextCursor);
+        setLoadingHistory(false);
+    };
+
+    function mapServerMessage(m: any): Message {
+        return {
+            id: m._id,
+            role: m.role,
+            text: m.text,
+            english: m.english,
+            audioUrl: m.audioUrl,
+            language: m.language,
+            timestamp: new Date(m.createdAt).getTime(),
+        };
+    }
+
 
     const sendToAI = async (
         nativeText: string,
@@ -143,8 +211,20 @@ export function ChatModal({
                 </div>
 
                 {/* Messages */}
+                {loadingHistory && (
+                    <div className="text-center text-xs text-stone-400">
+                        {t('LEM')}
+                    </div>
+                )}
+                {!messages.length && !loading && (
+                    <div className="text-center text-stone-400 mt-10">
+                        {t('AMA')}
+                    </div>
+                )}
+
                 <div
                     ref={bodyRef}
+                    onScroll={handleScroll}
                     className="flex-1 p-4 overflow-y-auto space-y-3"
                 >
                     {messages.map((m, i) => (

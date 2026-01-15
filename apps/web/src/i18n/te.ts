@@ -29,4 +29,6 @@ export default {
     GoodMorning: 'శుభోదయం',
     GoodAfternoon: 'శుభ మధ్యాహ్నం',
     GoodEvening: 'శుభ సాయంత్రం',
+    AMA: 'ఏదైనా అడగండి`',
+    LEM : 'మునుపటి సందేశాలను లోడ్ చేయండి',
 };

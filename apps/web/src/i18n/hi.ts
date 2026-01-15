@@ -29,4 +29,6 @@ export default {
     GoodMorning: 'सुप्रभात',
     GoodAfternoon: 'नमस्कार',
     GoodEvening: 'शुभ संध्या',
+    AMA: 'मुझसे कुछ भी पूछो',
+    LEM : ' पहले के संदेश लोड करें',
 };
