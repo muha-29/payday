@@ -29,7 +29,9 @@ import ChatHistory from './pages/Profile/ChatHistory';
 import { ChatPage } from './components/chat/ChatPage';
 import AddIncome from './pages/Earnings/AddEarning';
 import AddGoal from './pages/AddGoal';
-
+import PrivacyPolicy from './public/pages/PrivacyPolicy';
+import Terms from './public/pages/Terms';
+import Disclaimer from './public/pages/Disclaimer';
 
 const router = createBrowserRouter([
     // 🌐 PUBLIC (no auth)
@@ -40,7 +42,12 @@ const router = createBrowserRouter([
             { index: true, element: <PublicHome /> },
             { path: 'team', element: <Team /> },
             { path: 'features', element: <Features /> },
-            { path: 'login', element: <Login /> }
+            { path: 'login', element: <Login /> },
+
+            // 🔐 LEGAL
+            { path: 'privacy-policy', element: <PrivacyPolicy /> },
+            { path: 'terms', element: <Terms /> },
+            { path: 'disclaimer', element: <Disclaimer /> }
         ]
     },
 

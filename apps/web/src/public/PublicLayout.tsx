@@ -13,7 +13,7 @@ export default function PublicLayout() {
                     </h1>
 
                     <nav className="flex gap-6 text-white text-sm font-medium">
-                        
+
                         <NavLink to="/Features" className="hover:underline">
                             Features
                         </NavLink>
@@ -34,6 +34,40 @@ export default function PublicLayout() {
             <main>
                 <Outlet />
             </main>
+            <footer className="sticky bottom-0 border-t border-stone-900 mt-16">
+                <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-900">
+
+                    {/* LEFT */}
+                    <span>
+                        © {new Date().getFullYear()} PayDay. All rights reserved.
+                    </span>
+
+                    {/* RIGHT */}
+                    <div className="flex gap-4">
+                        <a
+                            href="/privacy-policy"
+                            className="hover:text-stone-800 transition"
+                        >
+                            Privacy Policy
+                        </a>
+
+                        <a
+                            href="/terms"
+                            className="hover:text-stone-800 transition"
+                        >
+                            Terms & Conditions
+                        </a>
+
+                        <a
+                            href="/disclaimer"
+                            className="hover:text-stone-800 transition"
+                        >
+                            Disclaimer
+                        </a>
+                    </div>
+                </div>
+            </footer>
+
         </div>
     );
 }
