@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const VoiceConversationSchema = new mongoose.Schema({
     userId: String,
-
+    role: { type: String, default: 'user' },
     // USER
     question: String,            // native user text
     englishQuestion: String,     // English sent to LLM
@@ -17,7 +17,17 @@ const VoiceConversationSchema = new mongoose.Schema({
 
     // 🔊 AUDIO
     audioUrl: String,            // <-- THIS WAS MISSING
-    ttsLanguage: String,         // optional but useful
+    ttsLanguage: String,
+    rating: {
+        type: Number,
+        min: 1,
+        max: 5,
+        default: null,
+    },
+    ratedAt: {
+        type: Date
+    },
+    createdAt: { type: Date, default: Date.now },     // optional but useful
 
 }, { timestamps: true });
 

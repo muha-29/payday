@@ -1,5 +1,5 @@
 import express from 'express';
-import { askAI } from '../controllers/ai.controller.js';
+import { askAI, rateConversation } from '../controllers/ai.controller.js';
 import { requireAuth } from '../middleware/auth.js';
 import VoiceConversation from '../models/voiceConversation.model.js';
 
@@ -19,5 +19,6 @@ router.get('/history', requireAuth, async (req, res) => {
 });
 
 router.post('/ask', requireAuth, askAI);
+router.post('/chat/rate', requireAuth, rateConversation);
 
 export default router;

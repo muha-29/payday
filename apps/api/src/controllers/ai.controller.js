@@ -27,7 +27,8 @@ export async function askAI(req, res) {
     const {
         native,
         english,
-        language = "en-IN"
+        language = "en-IN",
+        targetLanguage = 'en-IN'
     } = req.body;
 
     /* ---------- 0️⃣ Validation ---------- */
@@ -41,6 +42,7 @@ export async function askAI(req, res) {
     let aiEnglishAnswer = "";
     let aiNativeAnswer = "";
     let audioUrl = null;
+    let conversationId = null;
 
     try {
         /* ---------- 1️⃣ Intent detection (English only) ---------- */
@@ -63,12 +65,13 @@ export async function askAI(req, res) {
             context,
             language: "en-IN"
         });
-
+        console.log("[AI ANSWER]", aiEnglishAnswer);
+        console.log("language", targetLanguage);
         /* ---------- 5️⃣ Translate AI → native (if needed) ---------- */
-        if (language !== "en-IN") {
+        if (targetLanguage !== "en-IN") {
             aiNativeAnswer = await translateFromEnglish(
                 aiEnglishAnswer,
-                language
+                targetLanguage
             );
         } else {
             aiNativeAnswer = aiEnglishAnswer;
@@ -85,7 +88,7 @@ export async function askAI(req, res) {
     try {
         const tts = await generateSpeech(
             aiNativeAnswer,
-            language
+            targetLanguage
         );
 
         if (tts?.audioUrl) {
@@ -97,7 +100,7 @@ export async function askAI(req, res) {
 
     /* ---------- 7️⃣ Persist conversation (best effort) ---------- */
     try {
-        await VoiceConversation.create({
+        const convo = await VoiceConversation.create({
             userId,
 
             // User input
@@ -108,20 +111,45 @@ export async function askAI(req, res) {
             answer: aiNativeAnswer,
             answerEnglish: aiEnglishAnswer,
 
-            language,
+            language: targetLanguage,
             intent,
             audioUrl,
-            source: "voice"
+            source: "voice",
+            ttsLanguage: targetLanguage,
         });
+
+        conversationId = convo._id.toString();
     } catch (err) {
         console.warn("[DB WRITE FAILED]", err.message);
     }
 
     /* ---------- 8️⃣ Final response ---------- */
     return res.json({
+        id: conversationId,
         text: aiNativeAnswer,      // shown in chat
         english: aiEnglishAnswer,  // ℹ️ toggle
-        language,
+        lang: targetLanguage,
         audioUrl
     });
+}
+
+export async function rateConversation(req, res) {
+    const userId = req.user.id;
+    const { messageId, rating } = req.body;
+
+    if (!messageId || rating < 1 || rating > 5) {
+        return res.status(400).json({ error: "Invalid rating" });
+    }
+
+    await VoiceConversation.updateOne(
+        { _id: messageId, userId },
+        {
+            $set: {
+                rating,
+                ratedAt: new Date()
+            }
+        }
+    );
+
+    res.json({ success: true });
 }
