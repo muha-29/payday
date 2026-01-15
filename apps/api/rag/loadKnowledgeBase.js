@@ -3,7 +3,7 @@ import path from "path";
 
 export function loadKnowledgeBase() {
     const filePath = path.resolve(
-        "apps/api/data/knowledge/payday_faqs.json"
+        "data/knowledge/payday_faqs.json"
     );
 
     const raw = fs.readFileSync(filePath, "utf-8");
