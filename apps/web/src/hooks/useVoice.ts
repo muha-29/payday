@@ -60,7 +60,7 @@ export function useVoice(
 
     try {
       const res = await fetch(
-        import.meta.env.VITE_API_BASE_URL + "stt",
+        import.meta.env.VITE_API_BASE_URL + "/stt",
         { method: "POST", body: fd }
       );
 
