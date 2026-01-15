@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { AppInstallPrompt } from "../components/pwa/AppInstallPrompt";
+
 
 import Header from './Header';
 import BottomNav from './BottomNav';
@@ -18,6 +20,8 @@ export default function AppLayout() {
 
             <main className="pt-4 pb-24 px-4">
                 <Outlet />
+                <AppInstallPrompt />
+
             </main>
 
             <BottomNav />
@@ -35,7 +39,7 @@ export default function AppLayout() {
                         console.log('❌ Chat closed');
                         setIsChatOpen(false);
                     }}
-                    
+
                 />
             )}
         </div>
