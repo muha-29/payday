@@ -1,9 +1,8 @@
-import { useRef } from "react";
-const domain = 'https://payday-api.onrender.com';
+import { useRef, useState } from "react";
 
 export type VoiceResult = {
-  transcript: string; // native language
-  english: string;    // translated English
+  transcript: string;
+  english: string;
   language: string;
 };
 
@@ -13,72 +12,76 @@ export function useVoice(
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
 
-  const start = async () => {
+  const [recording, setRecording] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [processing, setProcessing] = useState(false);
+
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const recorder = new MediaRecorder(stream);
+
+    chunksRef.current = [];
+    mediaRecorderRef.current = recorder;
+
+    recorder.ondataavailable = e => {
+      if (e.data.size > 0) chunksRef.current.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      setRecording(false);
+      setReady(true);
+      stream.getTracks().forEach(t => t.stop());
+    };
+
+    recorder.start();
+    setRecording(true);
+    setReady(false);
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+  };
+
+  const cancelRecording = () => {
+    chunksRef.current = [];
+    mediaRecorderRef.current?.stop();
+    setRecording(false);
+    setReady(false);
+  };
+
+  const sendRecording = async () => {
+    if (!ready || processing) return;
+
+    setProcessing(true);
+
+    const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+    const fd = new FormData();
+    fd.append("audio", blob);
+
     try {
-      console.log("🎤 Starting Sarvam voice capture");
+      const res = await fetch(
+        import.meta.env.VITE_API_BASE_URL + "/stt",
+        { method: "POST", body: fd }
+      );
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-
-      chunksRef.current = [];
-      mediaRecorderRef.current = recorder;
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunksRef.current.push(e.data);
-        }
-      };
-
-      recorder.onstop = async () => {
-        console.log("🛑 Mic stopped, sending to Sarvam STT");
-
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-
-        const fd = new FormData();
-        fd.append("audio", blob);
-
-        try {
-          const res = await fetch(`${domain}/stt`, {
-            method: "POST",
-            body: fd,
-          });
-
-          if (!res.ok) {
-            throw new Error("STT request failed");
-          }
-
-          const json = await res.json();
-          const data = json.data;
-
-          if (!data?.transcript) {
-            console.warn("⚠️ Empty STT result");
-            return;
-          }
-
-          const result: VoiceResult = {
-            transcript: data.transcript,
-            english: data.english || data.transcript,
-            language: data.language || "unknown",
-          };
-
-          console.log("🎙️ Voice result:", result);
-
-          onFinalResult(result);
-        } catch (err) {
-          console.error("❌ Sarvam STT failed", err);
-        } finally {
-          stream.getTracks().forEach((t) => t.stop());
-        }
-      };
-
-      recorder.start();
-
-      // ⏱️ Fixed capture window (POC-safe)
-      setTimeout(() => recorder.stop(), 4000);
+      const json = await res.json();
+      onFinalResult(json.data);
     } catch (err) {
-      console.error("❌ Mic error", err);
+      console.error("STT failed", err);
+    } finally {
+      setProcessing(false);
+      setReady(false);
+      chunksRef.current = [];
     }
   };
 
-  return { start };
+  return {
+    recording,
+    ready,
+    processing,
+    startRecording,
+    stopRecording,
+    sendRecording,
+    cancelRecording,
+  };
 }

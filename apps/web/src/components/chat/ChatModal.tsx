@@ -8,9 +8,9 @@ import { useProfile } from "../../hooks/useProfile";
 
 type Message = {
     role: "user" | "ai";
-    text: string;          // Native language (displayed)
-    english?: string;      // English translation
-    audioUrl?: string;    // 🔊 TTS
+    text: string;
+    english?: string;
+    audioUrl?: string;
     timestamp: number;
     language?: string;
 };
@@ -31,7 +31,7 @@ export function ChatModal({
     const bodyRef = useRef<HTMLDivElement | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    /* ---------- Effects ---------- */
+    /* ---------- Auto focus & scroll ---------- */
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -55,8 +55,7 @@ export function ChatModal({
 
         const now = Date.now();
 
-        /* 1️⃣ USER bubble (native) */
-        setMessages((prev) => [
+        setMessages(prev => [
             ...prev,
             {
                 role: "user",
@@ -71,20 +70,18 @@ export function ChatModal({
         setInput("");
 
         try {
-            /* 2️⃣ AI — ENGLISH ONLY */
             const res = await askAI({
                 native: nativeText,
-                question: englishText, // ✅ ONLY THIS
-                language: profile?.language,
+                question: englishText,
+                language: lang,
             });
 
-            /* 3️⃣ AI bubble */
-            setMessages((prev) => [
+            setMessages(prev => [
                 ...prev,
                 {
                     role: "ai",
-                    text: res.text,        // native
-                    english: res.english,  // English
+                    text: res.text,
+                    english: res.english,
                     audioUrl: res.audioUrl,
                     language: lang,
                     timestamp: Date.now(),
@@ -92,7 +89,7 @@ export function ChatModal({
             ]);
         } catch (err) {
             console.error("[AI ERROR]", err);
-            setMessages((prev) => [
+            setMessages(prev => [
                 ...prev,
                 {
                     role: "ai",
@@ -105,68 +102,25 @@ export function ChatModal({
         }
     };
 
-    const sendVoice = async (
-        nativeText: string,
-        englishText: string,
-        lang: string
-    ) => {
-        if (loading) return;
+    /* ---------- Voice Hook ---------- */
 
-        const now = Date.now();
-
-        // 1️⃣ Show USER message (native)
-        setMessages(prev => [
-            ...prev,
-            {
-                role: "user",
-                text: nativeText,
-                english: englishText,
-                language: lang,
-                timestamp: now,
-            }
-        ]);
-
-        setLoading(true);
-
-        try {
-            // 2️⃣ Send ONLY English to AI
-            const res = await askAI({
-                native: nativeText,
-                question: englishText,
-                language: lang,
-            });
-
-            // 3️⃣ Show AI response
-            setMessages(prev => [
-                ...prev,
-                {
-                    role: "ai",
-                    text: res.text,        // native AI
-                    english: res.english,  // English AI
-                    language: lang,
-                    timestamp: Date.now(),
-                    audioUrl: res.audioUrl,
-                }
-            ]);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /* ---------- Voice ---------- */
-
-    const { start } = useVoice(({ transcript, english, language }) => {
-        // sendToAI(transcript, english, language);
-        sendVoice(transcript, english, language);
+    const {
+        recording,
+        ready,
+        processing,
+        startRecording,
+        stopRecording,
+        sendRecording,
+        cancelRecording,
+    } = useVoice(({ transcript, english, language }) => {
+        sendToAI(transcript, english, language);
     });
 
     /* ---------- Typed Input ---------- */
 
     const sendTyped = () => {
         if (!input.trim()) return;
-        sendToAI(input, input, language); // typed text = English
+        sendToAI(input, input, language);
     };
 
     /* ---------- UI ---------- */
@@ -214,34 +168,76 @@ export function ChatModal({
                     )}
                 </div>
 
-                {/* Input */}
-                <div className="p-3 border-t flex gap-2">
+                {/* Input + Voice Controls */}
+                <div className="p-3 border-t flex items-center gap-3">
+
                     <input
                         ref={inputRef}
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Type in your language…"
+                        onChange={e => setInput(e.target.value)}
+                        placeholder={
+                            recording
+                                ? "Recording voice…"
+                                : processing
+                                    ? "Sending voice…"
+                                    : "Type in your language…"
+                        }
+                        disabled={loading || recording || processing}
                         className="flex-1 border rounded-lg px-3 py-2"
-                        onKeyDown={(e) => e.key === "Enter" && sendTyped()}
-                        disabled={loading}
+                        onKeyDown={e => e.key === "Enter" && sendTyped()}
                     />
 
-                    <button
-                        onClick={sendTyped}
-                        disabled={loading}
-                        className="px-4 py-2 rounded-lg bg-orange-500 text-white"
-                    >
-                        Send
-                    </button>
+                    {/* Idle */}
+                    {!recording && !ready && !processing && (
+                        <>
+                            <button
+                                onClick={sendTyped}
+                                disabled={loading}
+                                className="bg-orange-500 text-white px-4 py-2 rounded-lg"
+                            >
+                                Send
+                            </button>
 
-                    <button
-                        onClick={start}
-                        disabled={loading}
-                        className="px-3 py-2 rounded-lg bg-stone-100"
-                        aria-label="Speak"
-                    >
-                        🎙️
-                    </button>
+                            <button
+                                onClick={startRecording}
+                                className="bg-stone-100 px-3 py-2 rounded-lg"
+                                title="Record voice"
+                            >
+                                🎙️
+                            </button>
+                        </>
+                    )}
+
+                    {/* Recording */}
+                    {recording && (
+                        <>
+                            <span className="text-red-500 text-sm animate-pulse">
+                                ● Recording
+                            </span>
+                            <button onClick={stopRecording}>⏹</button>
+                            <button onClick={cancelRecording}>❌</button>
+                        </>
+                    )}
+
+                    {/* Ready */}
+                    {ready && !processing && (
+                        <>
+                            <button
+                                onClick={sendRecording}
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                            >
+                                Send Voice
+                            </button>
+                            <button onClick={cancelRecording}>❌</button>
+                        </>
+                    )}
+
+                    {/* Processing */}
+                    {processing && (
+                        <span className="text-xs text-stone-500">
+                            Uploading…
+                        </span>
+                    )}
                 </div>
             </div>
         </div>
