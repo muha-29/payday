@@ -9,6 +9,12 @@ import dashboardRoutes from './routes/dashboard.routes.js';
 import aiRoutes from './routes/ai.routes.js';
 import sttRoute from "./routes/stt.js";
 
+import { loadKnowledgeBase } from "../rag/loadKnowledgeBase.js";
+import { assertEnv } from "./utils/assertEnv.js";
+
+assertEnv(); // 🔒 fail fast if env missing
+
+
 
 
 const app = express();
@@ -23,6 +29,19 @@ app.use(cors({
 })); 
 
 app.use(express.json());
+
+/* ---------------- RAG INIT ---------------- */
+
+// ✅ Load once at startup
+export const KNOWLEDGE_BASE = loadKnowledgeBase();
+
+console.log(
+  `📚 Knowledge base loaded: ${KNOWLEDGE_BASE.domains.length} domains`
+);
+
+/* ----------------------------------------- */
+
+// routes
 
 app.use('/api/income', incomeRoutes);
 app.use('/api/savings', savingsRoutes);

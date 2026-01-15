@@ -1,18 +1,24 @@
-import VoiceConversation from '../models/voiceConversation.model.js';
-import { detectIntent } from '../utils/detectIntent.js';
-import { buildContext } from '../utils/buildContext.js';
-import { runAI } from '../services/ai.service.js';
-import { generateSpeech } from '../services/tts.service.js';
-import { normalizeSpeechText } from '../utils/normalizeSpeechText.js';
-import { translateFromEnglish } from '../services/sarvam.translate.fromEnglish.js';
+import VoiceConversation from "../models/voiceConversation.model.js";
+
+import { detectIntent } from "../utils/detectIntent.js";
+import { buildContext } from "../utils/buildContext.js";
+import { normalizeSpeechText } from "../utils/normalizeSpeechText.js";
+
+import { runAI } from "../services/ai.service.js";
+import { generateSpeech } from "../services/tts.service.js";
+import { translateFromEnglish } from "../services/sarvam.translate.fromEnglish.js";
+
+// 🔒 Loaded once at boot (from index/app entry)
+import { KNOWLEDGE_BASE } from "../app.js";
 
 /**
  * POST /api/ai/ask
+ *
  * Body:
  * {
- *   native: string,        // user language
- *   english: string,       // translated English (for LLM)
- *   language: string       // hi-IN, te-IN, etc
+ *   native: string,        // user native language (UI display)
+ *   english: string,       // translated English (LLM input)
+ *   language: string       // user language code (hi-IN, te-IN, ta-IN, etc)
  * }
  */
 export async function askAI(req, res) {
@@ -21,85 +27,101 @@ export async function askAI(req, res) {
     const {
         native,
         english,
-        language = 'en-IN',
-        targetLanguage = 'en-IN'
+        language = "en-IN"
     } = req.body;
 
-    if (!userId || !english) {
-        return res.status(400).json({ error: 'Invalid request' });
+    /* ---------- 0️⃣ Validation ---------- */
+    if (!userId || !english?.trim()) {
+        return res.status(400).json({
+            error: "Invalid request: missing user or English text"
+        });
     }
 
-    let aiEnglishAnswer = '';
-    let aiNativeAnswer = '';
+    let intent = "unknown";
+    let aiEnglishAnswer = "";
+    let aiNativeAnswer = "";
     let audioUrl = null;
-    let intent = 'unknown';
 
     try {
-        /* ---------- 1️⃣ Detect intent (English-safe) ---------- */
+        /* ---------- 1️⃣ Intent detection (English only) ---------- */
         intent = detectIntent(english);
 
-        /* ---------- 2️⃣ Build context ---------- */
-        const context = await buildContext(userId, intent);
+        /* ---------- 2️⃣ Build user + domain context ---------- */
+        const context = await buildContext(userId, intent, {
+            knowledgeBase: KNOWLEDGE_BASE
+        });
 
         /* ---------- 3️⃣ Normalize English ---------- */
-        const normalizedEnglish = normalizeSpeechText(english, 'en-IN');
+        const normalizedEnglish = normalizeSpeechText(
+            english,
+            "en-IN"
+        );
 
-        /* ---------- 4️⃣ Run AI (ENGLISH ONLY) ---------- */
+        /* ---------- 4️⃣ Run AI (STRICT ENGLISH MODE) ---------- */
         aiEnglishAnswer = await runAI({
             question: normalizedEnglish,
             context,
-            language: 'en-IN'   // 🔒 ALWAYS ENGLISH
+            language: "en-IN"
         });
 
-        /* ---------- 5️⃣ Translate AI → native ---------- */
-        console.log('🌐 Translating AI answer to', targetLanguage);
-        if (targetLanguage !== 'en-IN') {
+        /* ---------- 5️⃣ Translate AI → native (if needed) ---------- */
+        if (language !== "en-IN") {
             aiNativeAnswer = await translateFromEnglish(
                 aiEnglishAnswer,
-                targetLanguage
+                language
             );
         } else {
             aiNativeAnswer = aiEnglishAnswer;
         }
 
     } catch (err) {
-        console.error('[AI ERROR]', err);
-        return res.status(500).json({ error: 'AI processing failed' });
+        console.error("[AI ERROR]", err);
+        return res.status(500).json({
+            error: "AI processing failed"
+        });
     }
 
-    /* ---------- 6️⃣ Optional TTS (native) ---------- */
+    /* ---------- 6️⃣ Optional TTS (non-blocking) ---------- */
     try {
-        const ttsResult = await generateSpeech(aiNativeAnswer, targetLanguage);
+        const tts = await generateSpeech(
+            aiNativeAnswer,
+            language
+        );
 
-        if (ttsResult?.filename) {
-            audioUrl = `/audio/${ttsResult.filename}`;
+        if (tts?.audioUrl) {
+            audioUrl = tts.audioUrl;
         }
     } catch (err) {
-        console.warn('[TTS FAILED]', err.message);
+        console.warn("[TTS FAILED]", err.message);
     }
 
-    /* ---------- 7️⃣ Persist conversation ---------- */
+    /* ---------- 7️⃣ Persist conversation (best effort) ---------- */
     try {
         await VoiceConversation.create({
             userId,
-            question: native,              // native user text
-            questionEnglish: english,      // 🔥 store English
-            answer: aiNativeAnswer,        // native AI
-            answerEnglish: aiEnglishAnswer,// 🔥 store English
-            language : targetLanguage,
+
+            // User input
+            question: native,
+            questionEnglish: english,
+
+            // AI output
+            answer: aiNativeAnswer,
+            answerEnglish: aiEnglishAnswer,
+
+            language,
             intent,
             audioUrl,
-            ttsLanguage: targetLanguage,
+            source: "voice"
         });
     } catch (err) {
-        console.warn('[DB WRITE FAILED]', err.message);
+        console.warn("[DB WRITE FAILED]", err.message);
     }
 
-    /* ---------- 8️⃣ Respond ---------- */
+    /* ---------- 8️⃣ Final response ---------- */
     return res.json({
-        text: aiNativeAnswer,        // native (UI)
-        english: aiEnglishAnswer,    // English (ℹ️)
-        lang : targetLanguage,
+        text: aiNativeAnswer,      // shown in chat
+        english: aiEnglishAnswer,  // ℹ️ toggle
+        language,
         audioUrl
     });
 }

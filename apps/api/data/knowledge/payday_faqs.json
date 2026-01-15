@@ -1,0 +1,119 @@
+{
+    "version": "1.0",
+    "source": "PayDay Internal Knowledge Base",
+    "language": "en-IN",
+    "domains": [
+        {
+            "id": "money_basics",
+            "name": "Money Basics",
+            "intent": "clarity",
+            "entries": [
+                {
+                    "id": "mb_01",
+                    "question": "Why saving small amounts matters",
+                    "answer": "Saving even ₹10–₹20 daily builds a habit. Small savings protect you on days when income is low. You don’t need to save big amounts to start."
+                },
+                {
+                    "id": "mb_02",
+                    "question": "How much should I save from today’s earning?",
+                    "answer": "A safe rule is 5–10% of what you earn today. If income is low, it’s okay to save less or skip. Saving should never cause stress."
+                },
+                {
+                    "id": "mb_03",
+                    "question": "What is irregular income?",
+                    "answer": "Irregular income means your earnings change daily or weekly. Many gig workers have this. Planning daily savings works better than monthly budgets."
+                },
+                {
+                    "id": "mb_04",
+                    "question": "Needs vs wants",
+                    "answer": "Needs are essentials like food, rent, travel. Wants are optional like eating out or shopping. Saving becomes easier when needs are covered first."
+                },
+                {
+                    "id": "mb_05",
+                    "question": "Why daily tracking helps",
+                    "answer": "Adding income daily helps you see patterns. You understand which days are good and which are slow. This helps plan savings better."
+                }
+            ]
+        },
+        {
+            "id": "savings_safety",
+            "name": "Savings & Safety",
+            "intent": "control",
+            "entries": [
+                {
+                    "id": "ss_01",
+                    "question": "What is an emergency fund?",
+                    "answer": "An emergency fund is money kept for sudden needs like medical expenses or job loss. Even ₹500–₹1000 saved helps."
+                },
+                {
+                    "id": "ss_02",
+                    "question": "Should I save if I have debt?",
+                    "answer": "Save small amounts while repaying debt. Emergency savings prevent more borrowing."
+                },
+                {
+                    "id": "ss_03",
+                    "question": "Why saving daily works better",
+                    "answer": "Daily saving matches daily income. Monthly saving is harder for gig workers."
+                }
+            ]
+        },
+        {
+            "id": "fraud_scams",
+            "name": "Fraud & Scams",
+            "intent": "confidence",
+            "entries": [
+                {
+                    "id": "fs_01",
+                    "question": "What is an OTP scam?",
+                    "answer": "Banks never ask for OTP. Anyone asking OTP is a scammer. Do not share OTP."
+                },
+                {
+                    "id": "fs_02",
+                    "question": "What should I do if money is lost to fraud?",
+                    "answer": "Call 1930 immediately and report at cybercrime.gov.in. Act fast."
+                },
+                {
+                    "id": "fs_03",
+                    "question": "One golden safety rule",
+                    "answer": "Never share OTP, PIN, or passwords with anyone."
+                }
+            ]
+        },
+        {
+            "id": "govt_schemes",
+            "name": "Government Schemes",
+            "intent": "assistance",
+            "entries": [
+                {
+                    "id": "gs_01",
+                    "question": "What is Atal Pension Yojana?",
+                    "answer": "Atal Pension Yojana is a government pension scheme that gives a fixed monthly pension after age 60. Contributions can start as low as ₹42 per month.",
+                    "official_link": "https://www.npscra.nsdl.co.in/scheme-details.php"
+                },
+                {
+                    "id": "gs_02",
+                    "question": "What is PM Suraksha Bima Yojana?",
+                    "answer": "PMSBY provides ₹2 lakh accident cover for ₹20 per year. Useful for gig workers with higher travel risk.",
+                    "official_link": "https://jansuraksha.gov.in/PMSBY.aspx"
+                }
+            ]
+        },
+        {
+            "id": "app_guidance",
+            "name": "App Guidance",
+            "intent": "control",
+            "entries": [
+                {
+                    "id": "ag_01",
+                    "question": "Does PayDay move my money?",
+                    "answer": "No. PayDay only guides. You control all money."
+                },
+                {
+                    "id": "ag_02",
+                    "question": "Is my data safe?",
+                    "answer": "Your data is private and not shared without consent."
+                }
+            ]
+        }
+    ]
+}
