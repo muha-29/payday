@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useProfile } from '../../hooks/useProfile';
 import { useI18n } from '../../hooks/useI18n';
+import { revokeConsent, hasConsent } from "../../utils/consent";
 
 export default function Profile() {
   const { profile, loading, updateProfile } = useProfile();
@@ -28,7 +29,7 @@ export default function Profile() {
     try {
       setSaving(true);
       await updateProfile({ language: newLang });
-      toast('🚧 '+t('savingPreference'), {
+      toast('🚧 ' + t('savingPreference'), {
         icon: '⏳'
       });
       // ✅ Force full reload after save
@@ -110,6 +111,20 @@ export default function Profile() {
             </p>
           )}
         </div>
+
+        <button
+          onClick={() => revokeConsent("voice")}
+          disabled={!hasConsent("voice")}
+        >
+          Revoke Voice Consent
+        </button>
+
+        <button
+          onClick={() => revokeConsent("ocr")}
+          disabled={!hasConsent("ocr")}
+        >
+          Revoke OCR Consent
+        </button>
 
         {/* Logout */}
         <button

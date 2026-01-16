@@ -4,6 +4,9 @@ import { useVoice } from "../../hooks/useVoice";
 import { ChatBubble } from "./ChatBubble";
 import { useProfile } from "../../hooks/useProfile";
 
+import { hasConsent, grantConsent } from "../../utils/consent";
+import { PrivacyConsentModal } from "../PrivacyConsentModal";
+
 /* ---------- Types ---------- */
 
 type Message = {
@@ -31,7 +34,15 @@ export function ChatModal({
     const bodyRef = useRef<HTMLDivElement | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
 
-    /* ---------- Effects ---------- */
+    const [cursor, setCursor] = useState<number | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+    const [oldCHats, setOldChats] = useState<any[]>([]);
+    const [showVoiceConsent, setShowVoiceConsent] = useState(false);
+
+
+
+    /* ---------- Auto focus & scroll ---------- */
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -64,6 +75,7 @@ export function ChatModal({
                 english: englishText,
                 language: lang,
                 timestamp: now,
+                id: 'temp-' + now,
             },
         ]);
 
@@ -98,6 +110,7 @@ export function ChatModal({
                     role: "ai",
                     text: "Sorry, I could not help right now.",
                     timestamp: Date.now(),
+                    id: '1',
                 },
             ]);
         } finally {
