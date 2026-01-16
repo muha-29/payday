@@ -1,4 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom';
+import { PWAInstallBanner } from "../components/PWAInstallBanner";
 
 export default function PublicLayout() {
     return (
@@ -27,12 +28,14 @@ export default function PublicLayout() {
                             Login
                         </NavLink>
                     </nav>
+                    
                 </div>
             </header>
 
             {/* Content */}
             <main>
                 <Outlet />
+                <PWAInstallBanner />
             </main>
             <footer className="sticky bottom-0 border-t border-stone-900 mt-16">
                 <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-900">

@@ -32,6 +32,14 @@ import AddGoal from './pages/AddGoal';
 import PrivacyPolicy from './public/pages/PrivacyPolicy';
 import Terms from './public/pages/Terms';
 import Disclaimer from './public/pages/Disclaimer';
+const updateSW = registerSW({
+    onNeedRefresh() {
+        console.log("🔄 New version available");
+    },
+    onOfflineReady() {
+        console.log("📦 App ready to work offline");
+    }
+});
 
 const router = createBrowserRouter([
     // 🌐 PUBLIC (no auth)
@@ -91,7 +99,3 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </>
     </React.StrictMode>
 );
-
-registerSW({
-    immediate: true,
-})
