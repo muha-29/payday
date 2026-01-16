@@ -1,9 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { usePWAInstall } from "../hooks/usePWAInstall";
-
+import { PWAInstallBanner } from "../components/PWAInstallBanner";
 
 export default function PublicLayout() {
-    const { canInstall, install } = usePWAInstall();
     return (
         <div className="min-h-screen bg-stone-50">
             {/* Header */}
@@ -30,20 +28,14 @@ export default function PublicLayout() {
                             Login
                         </NavLink>
                     </nav>
-                    {canInstall && (
-                        <button
-                            onClick={install}
-                            className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg"
-                        >
-                            📲 Install App
-                        </button>
-                    )}
+                    
                 </div>
             </header>
 
             {/* Content */}
             <main>
                 <Outlet />
+                <PWAInstallBanner />
             </main>
         </div>
     );
