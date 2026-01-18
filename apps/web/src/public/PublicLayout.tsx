@@ -1,5 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { PWAInstallBanner } from "../components/PWAInstallBanner";
+import LandingChatBox from "./components/LandingChatBot";
 
 export default function PublicLayout() {
     return (
@@ -28,13 +29,16 @@ export default function PublicLayout() {
                             Login
                         </NavLink>
                     </nav>
-                    
+
                 </div>
             </header>
 
             {/* Content */}
             <main>
                 <Outlet />
+                {/* Landing chatbot */}
+                <LandingChatBox />
+
                 <PWAInstallBanner />
             </main>
             <footer className="sticky bottom-0 border-t border-stone-900 mt-16">

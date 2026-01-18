@@ -9,6 +9,7 @@ import dashboardRoutes from './routes/dashboard.routes.js';
 import aiRoutes from './routes/ai.routes.js';
 import sttRoute from "./routes/stt.js";
 import ocrRoutes from "./routes/ocr.js";
+import publicBotRoutes from './routes/landingBot.routes.js';
 
 import { loadKnowledgeBase } from "../rag/loadKnowledgeBase.js";
 import { assertEnv } from "./utils/assertEnv.js";
@@ -49,6 +50,8 @@ app.use('/api/savings', savingsRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/earnings', earningsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use("/api/public-bot", publicBotRoutes);
+
 app.use("/stt", sttRoute);
 app.use('/api/ai', aiRoutes);
 app.use("/api/ocr", ocrRoutes);
