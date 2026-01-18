@@ -60,8 +60,12 @@ export function useVoice(
 
     try {
       const res = await fetch(
-        import.meta.env.VITE_BACKE_END + "/stt",
-        { method: "POST", body: fd }
+        import.meta.env.VITE_BACKE_END + "stt",
+        {
+          method: "POST",
+          body: fd,
+          // credentials: "include"
+        }
       );
 
       const json = await res.json();
