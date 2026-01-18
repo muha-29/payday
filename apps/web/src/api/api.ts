@@ -19,8 +19,10 @@ export async function apiFetch<T = any>(
     });
 
     if (res.status === 401) {
-        window.location.href = '/login';
-        throw new Error('Unauthorized');
+        setTimeout(function () {
+            window.location.href = '/login';
+            throw new Error('Unauthorized');
+        }, 5000);
     }
 
     if (!res.ok) {

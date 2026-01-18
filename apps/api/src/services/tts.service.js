@@ -2,6 +2,9 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { SarvamAIClient } from "sarvamai";
+import { trackAiUsage } from "../middleware/trackAiUsage.js";
+import {estimateAudioDuration} from "../utils/estimateAudioDuration.js";
+
 
 const AUDIO_DIR = path.resolve("public/audio");
 
@@ -19,7 +22,7 @@ const sarvam = new SarvamAIClient({
  * - Decodes base64 audio correctly
  * - Writes browser-playable MP3
  */
-export async function generateSpeech(text, language = "en-IN") {
+export async function generateSpeech(text, language = "en-IN", userId) {
     if (!text?.trim()) return null;
 
     const id = crypto.randomUUID();
@@ -59,6 +62,9 @@ export async function generateSpeech(text, language = "en-IN") {
     /* ---------- Decode base64 audio ---------- */
     const audioBase64 = response.audios[0];
     const audioBuffer = Buffer.from(audioBase64, "base64");
+
+    const durationSeconds = estimateAudioDuration(audioBuffer); // 🔥 important
+    await trackAiUsage(userId, durationSeconds);
 
     fs.writeFileSync(filePath, audioBuffer);
 

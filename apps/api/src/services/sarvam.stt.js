@@ -1,4 +1,7 @@
 import { SarvamAIClient } from "sarvamai";
+import { trackAiUsage } from "../middleware/trackAiUsage.js";
+import { estimateAudioDuration } from "../utils/estimateAudioDuration.js";
+
 
 const client = new SarvamAIClient({
   apiSubscriptionKey: process.env.SARVAM_API_KEY,
@@ -8,14 +11,20 @@ const client = new SarvamAIClient({
  * Sarvam AI STT Service  
  * Handles speech-to-text with auto language detection and English translation  
  */
-export async function transcribe(audioBuffer) {
+export async function transcribe(audioBuffer, userId) {
   try {
+
     /* ---------- 1️⃣ Speech to Text ---------- */
     const sttResponse = await client.speechToText.transcribe({
       file: audioBuffer,
       language_code: "unknown", // Auto-detect  
       model: "saarika:v2.5",
     });
+    if (userId) {
+      const durationSeconds = estimateAudioDuration(audioBuffer); // 🔥 important
+      console.log('durationSeconds', durationSeconds);
+      await trackAiUsage(userId, durationSeconds);
+    }
 
     const transcript = sttResponse.transcript;
     const language = sttResponse.language_code || "unknown";

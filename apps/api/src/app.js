@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from "cookie-parser";
 
 import incomeRoutes from './routes/income.routes.js';
 import savingsRoutes from './routes/savings.routes.js';
@@ -13,6 +14,7 @@ import publicBotRoutes from './routes/landingBot.routes.js';
 
 import { loadKnowledgeBase } from "../rag/loadKnowledgeBase.js";
 import { assertEnv } from "./utils/assertEnv.js";
+import { authMiddleware } from "./middleware/auth.js"
 
 assertEnv(); // 🔒 fail fast if env missing
 
@@ -28,7 +30,7 @@ app.use(cors({
         'http://localhost:3000'
     ],
     credentials: true
-})); 
+}));
 
 app.use(express.json());
 
@@ -38,10 +40,11 @@ app.use(express.json());
 export const KNOWLEDGE_BASE = loadKnowledgeBase();
 
 console.log(
-  `📚 Knowledge base loaded: ${KNOWLEDGE_BASE.domains.length} domains`
+    `📚 Knowledge base loaded: ${KNOWLEDGE_BASE.domains.length} domains`
 );
 
 /* ----------------------------------------- */
+
 
 // routes
 
@@ -52,11 +55,16 @@ app.use('/api/earnings', earningsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use("/api/public-bot", publicBotRoutes);
 
-app.use("/stt", sttRoute);
+
 app.use('/api/ai', aiRoutes);
 app.use("/api/ocr", ocrRoutes);
 
 app.use("/audio", express.static("public/audio"));
+app.use("/stt", sttRoute);
+
+
+app.use(cookieParser());
+app.use(authMiddleware);      // 🔥 BEFORE routes
 
 
 

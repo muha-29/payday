@@ -25,3 +25,11 @@ export function requireAuth(req, res, next) {
     res.status(401).json({ error: 'Unauthorized' });
   }
 }
+export function authMiddleware(req, res, next) {
+  const token = req.cookies?.auth_token;
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  const payload = verifyJWT(token);
+  req.user = { id: payload.userId };
+  next();
+}

@@ -88,7 +88,8 @@ export async function askAI(req, res) {
     try {
         const tts = await generateSpeech(
             aiNativeAnswer,
-            targetLanguage
+            targetLanguage,
+            userId
         );
 
         if (tts?.audioUrl) {
