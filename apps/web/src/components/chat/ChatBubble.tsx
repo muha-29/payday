@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { apiFetch } from "../../api/api";
 import { StarRating } from "./rating";
-const API_URL = import.meta.env.VITE_API_BASE_URL;
+const API_URL = import.meta.env.VITE_BACKE_END;
 
 type ChatBubbleProps = {
     role: "user" | "ai";
