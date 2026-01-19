@@ -1,26 +1,41 @@
 import UserAiQuota from "../models/userAiQuota.model.js";
 
-export async function trackAiUsage(userId, seconds) {
+/**
+ * @param userId string
+ * @param seconds number
+ * @param type "stt" | "tts"
+ */
+export async function trackAiUsage(userId, seconds, type = "stt") {
+    if (!userId || !seconds) return;
+
+    const inc = {
+        usedSeconds: seconds,
+    };
+
+    if (type === "stt") inc.sttUsedSeconds = seconds;
+    if (type === "tts") inc.ttsUsedSeconds = seconds;
+
     const quota = await UserAiQuota.findOneAndUpdate(
         { userId },
-        { $inc: { usedSeconds: seconds } },
+        { $inc: inc },
         { new: true, upsert: true }
     );
-    console.log('quota', quota);
+
+    if (quota.isUnlimited) return quota;
+
     const percent = Math.round(
         (quota.usedSeconds / quota.totalSeconds) * 100
     );
-    console.log('percent', percent);
-    // 🔔 80% alert (once)
-    if (
-        percent >= quota.alertAtPercent &&
-        !quota.alertSent
-    ) {
+
+    /* ---------- 80% alert (once) ---------- */
+    if (percent >= quota.alertAtPercent && !quota.alertSent) {
         quota.alertSent = true;
         await quota.save();
 
-        // trigger notification (bell / email / UI)
-        console.log(`⚠️ User ${userId} reached ${percent}% AI quota`);
+        console.warn(
+            `⚠️ User ${userId} reached ${percent}% AI quota`
+        );
+        // later → bell notification / email
     }
 
     return quota;

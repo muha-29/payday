@@ -1,3 +1,4 @@
+import { apiFetch } from "../api/api";
 import { useRef, useState } from "react";
 
 export type VoiceResult = {
@@ -60,13 +61,19 @@ export function useVoice(
 
     try {
       const res = await fetch(
-        import.meta.env.VITE_BACKE_END + "/stt",
+        import.meta.env.VITE_BACKE_END + "/api/stt",
         {
           method: "POST",
           body: fd,
-          // credentials: "include"
+          credentials: "include"
         }
       );
+
+      // const res = await apiFetch('/stt', {
+      //   method: "POST",
+      //   body: fd,
+      //   // credentials: "include"
+      // });
 
       const json = await res.json();
       onFinalResult(json.data);

@@ -14,7 +14,8 @@ import publicBotRoutes from './routes/landingBot.routes.js';
 
 import { loadKnowledgeBase } from "../rag/loadKnowledgeBase.js";
 import { assertEnv } from "./utils/assertEnv.js";
-import { authMiddleware } from "./middleware/auth.js"
+import { authMiddleware } from "./middleware/auth.js";
+import aiProfileRoute from './routes/profile.ai.js';
 
 assertEnv(); // 🔒 fail fast if env missing
 
@@ -60,11 +61,13 @@ app.use('/api/ai', aiRoutes);
 app.use("/api/ocr", ocrRoutes);
 
 app.use("/audio", express.static("public/audio"));
-app.use("/stt", sttRoute);
+app.use("/api/stt", sttRoute);
+app.use("/api/usage", aiProfileRoute);
 
 
-app.use(cookieParser());
-app.use(authMiddleware);      // 🔥 BEFORE routes
+
+// app.use(cookieParser());
+// app.use(authMiddleware); 
 
 
 

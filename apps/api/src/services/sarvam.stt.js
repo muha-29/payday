@@ -23,7 +23,7 @@ export async function transcribe(audioBuffer, userId) {
     if (userId) {
       const durationSeconds = estimateAudioDuration(audioBuffer); // 🔥 important
       console.log('durationSeconds', durationSeconds);
-      await trackAiUsage(userId, durationSeconds);
+      await trackAiUsage(userId, durationSeconds, 'stt');
     }
 
     const transcript = sttResponse.transcript;

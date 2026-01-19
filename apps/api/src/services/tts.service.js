@@ -64,7 +64,7 @@ export async function generateSpeech(text, language = "en-IN", userId) {
     const audioBuffer = Buffer.from(audioBase64, "base64");
 
     const durationSeconds = estimateAudioDuration(audioBuffer); // 🔥 important
-    await trackAiUsage(userId, durationSeconds);
+    await trackAiUsage(userId, durationSeconds, 'tts');
 
     fs.writeFileSync(filePath, audioBuffer);
 

@@ -4,10 +4,15 @@ import { transcribe } from "../services/sarvam.stt.js";
 import { translateToEnglish } from "../services/sarvam.translate.js";
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 🔥 10 MB
+  },
+});
 
 router.post("/", upload.single("audio"), async (req, res) => {
-  const userId = req.user?.id;
+  const userId = req.headers["x-user-id"];
   console.log('audio_stt', req.user);
   try {
     if (!req.file?.buffer) {

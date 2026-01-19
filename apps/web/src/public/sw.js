@@ -13,6 +13,15 @@ self.addEventListener("install", event => {
 });
 
 self.addEventListener("fetch", event => {
+    const url = new URL(event.request.url);
+
+    // 🔥 NEVER intercept audio uploads
+    if (
+        url.pathname.startsWith("/api/stt") ||
+        url.pathname.startsWith("/api/ai")
+    ) {
+        return; // let browser handle it
+    }
     event.respondWith(
         caches.match(event.request).then(res => res || fetch(event.request))
     );

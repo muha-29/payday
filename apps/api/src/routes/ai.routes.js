@@ -7,7 +7,7 @@ import VoiceConversation from '../models/voiceConversation.model.js';
 const router = express.Router();
 
 router.get('/history', requireAuth, async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.headers["x-user-id"];
 
     const history = await VoiceConversation
         .find({ userId })
