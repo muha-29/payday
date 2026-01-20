@@ -64,3 +64,13 @@ export async function updateProfile(req, res) {
 
   res.json(profile);
 }
+
+export async function getProfileById(id) {
+  const profile = await Profile.findOne({ userId: id });
+
+  if (!profile) {
+    return null;
+  }
+
+  return profile.language;
+}

@@ -1,6 +1,8 @@
 export default {
     greeting: 'Hello',
     todayEarnings: "Today's Earnings",
+    addSavings:'Add Savings',
+    QuickStats:'QuickStats',
     saved: 'Saved',
     spent: 'Spent',
     addEarning: "Add Today's Earning",
@@ -26,4 +28,7 @@ export default {
     GoodEvening: 'Good Evening',
     AMA: 'Ask Me Anything',
     LEM : 'Load Earlier Messages',
+    AI_Usage: 'AI Usage',
+    AI_USAGE_DES : 'AI usage is calculated only to ensure fair access.Your voice is never sold or shared.',
+    SavingRegular : 'You’re saving regularly',
 };

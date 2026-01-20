@@ -1,5 +1,28 @@
 import Savings from '../models/savings.model.js';
 
+export async function getSavingsSummary(req, res) {
+  const userId = req.user.id;
+
+  const goals = await Savings.find({ userId });
+
+  res.json({
+    totalSaved: goals.reduce(
+      (s, g) => s + g.savedAmount,
+      0
+    ),
+    goals: goals.map((g) => ({
+      id: g._id,
+      name: g.name,
+      target: g.targetAmount,
+      saved: g.savedAmount,
+      percent: Math.round(
+        (g.savedAmount / g.targetAmount) * 100
+      )
+    }))
+  });
+}
+
+
 /**
  * GET /api/savings
  * List all savings goals for the logged-in user
@@ -73,7 +96,7 @@ export async function deleteSavings(req, res) {
     return res.status(404).json({ message: 'Savings goal not found' });
   }
 
-  res.status(204).end();
+  res.json({ message: 'Successfully Deleted' });
 }
 
 /**

@@ -19,8 +19,13 @@ export default function Savings() {
     setLoading(false);
   }
 
-  async function handleAddAmount(id: string) {
-    const value = prompt('Enter amount to add');
+  async function handleQuickAdd(id: string, amount: number) {
+    await addSavingsAmount(id, amount);
+    load();
+  }
+
+  async function handleCustomAdd(id: string) {
+    const value = prompt('Enter amount');
     if (!value) return;
     await addSavingsAmount(id, Number(value));
     load();
@@ -36,9 +41,24 @@ export default function Savings() {
     load();
   }, []);
 
+  const totalSavings = items.reduce(
+    (sum, g) => sum + g.savedAmount,
+    0
+  );
+
   return (
-    <div className="relative px-4 pb-32">
-      <h1 className="text-xl font-bold my-4">
+    <div className="relative px-4 pb-32 space-y-5">
+
+      {/* ===== TOTAL SAVINGS HEADER ===== */}
+      <section className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-4 text-white shadow">
+        <p className="text-xs opacity-90">Total Savings</p>
+        <h1 className="text-3xl font-bold">₹{totalSavings}</h1>
+        <p className="text-xs opacity-90">
+          {items.length} active goals
+        </p>
+      </section>
+
+      <h1 className="text-lg font-semibold">
         Savings Goals 🎯
       </h1>
 
@@ -52,6 +72,7 @@ export default function Savings() {
         </div>
       )}
 
+      {/* ===== GOALS ===== */}
       <ul className="space-y-4">
         {items.map((g) => {
           const percent = Math.min(
@@ -61,48 +82,75 @@ export default function Savings() {
             )
           );
 
+          const remaining =
+            g.targetAmount - g.savedAmount;
+
           return (
             <li
               key={g._id}
-              className="bg-white rounded-2xl p-4 shadow-sm"
+              className="bg-white rounded-2xl p-4 shadow space-y-3"
             >
-              <div className="flex justify-between items-center">
+              {/* Header */}
+              <div className="flex justify-between items-start">
                 <div>
-                  <div className="font-semibold">
-                    {g.title}
-                  </div>
-                  <div className="text-xs text-stone-500">
+                  <p className="font-bold">
+                    {g.name}
+                  </p>
+                  <p className="text-xs text-stone-500">
                     ₹{g.savedAmount} / ₹{g.targetAmount}
-                  </div>
+                  </p>
                 </div>
 
                 <button
                   onClick={() => handleDelete(g._id)}
-                  className="text-red-500 text-sm"
+                  className="text-red-500 text-xs"
                 >
                   Delete
                 </button>
               </div>
 
               {/* Progress */}
-              <div className="mt-3">
-                <div className="h-2 rounded bg-stone-200 overflow-hidden">
+              <div>
+                <div className="h-2 bg-stone-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-orange-500 to-amber-500"
                     style={{ width: `${percent}%` }}
                   />
                 </div>
-                <div className="text-xs text-stone-500 mt-1">
-                  {percent}% completed
+                <div className="flex justify-between text-xs mt-1 text-stone-500">
+                  <span>{percent}% completed</span>
+                  <span>
+                    ₹{remaining} more to go
+                  </span>
                 </div>
               </div>
 
+              {/* Quick Add */}
+              <div className="flex gap-2">
+                {[50, 100, 200].map((amt) => (
+                  <button
+                    key={amt}
+                    onClick={() =>
+                      handleQuickAdd(g._id, amt)
+                    }
+                    className="
+                      px-3 py-1 text-xs rounded-lg
+                      border border-orange-200
+                      text-orange-600
+                    "
+                  >
+                    +₹{amt}
+                  </button>
+                ))}
+              </div>
+
+              {/* Add Money */}
               <button
-                onClick={() => handleAddAmount(g._id)}
+                onClick={() => handleCustomAdd(g._id)}
                 className="
-                  mt-3 w-full py-2 rounded-xl
-                  text-orange-600 font-medium
-                  border border-orange-200
+                  w-full py-2 rounded-xl
+                  bg-orange-500 text-white
+                  font-semibold
                 "
               >
                 + Add Money
@@ -112,20 +160,22 @@ export default function Savings() {
         })}
       </ul>
 
-      {/* Floating Add Goal Button */}
+      {/* ===== FLOATING ADD GOAL ===== */}
       <button
         onClick={() => navigate('/app/add-goal')}
         className="
           fixed bottom-20 right-5
           w-14 h-14 rounded-full
-          text-white text-3xl font-bold
+          text-white text-3xl
           flex items-center justify-center
           shadow-lg
           bg-gradient-to-r from-orange-500 to-amber-500
         "
+        aria-label="Create goal"
       >
         +
       </button>
+
     </div>
   );
 }

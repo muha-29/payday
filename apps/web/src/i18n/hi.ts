@@ -2,7 +2,7 @@ export default {
     greeting: 'नमस्ते',
     todayEarnings: 'आज की कमाई',
     Home: 'होम',
-    Earning: 'कमाई',
+    Earnings: 'कमाई',
     Savings: 'बचत',
     Learn: 'सीखें',
     More: 'और',
@@ -30,5 +30,9 @@ export default {
     GoodAfternoon: 'नमस्कार',
     GoodEvening: 'शुभ संध्या',
     AMA: 'मुझसे कुछ भी पूछो',
-    LEM : ' पहले के संदेश लोड करें',
+    LEM: ' पहले के संदेश लोड करें',
+    AI_USAGE_DES: 'AI के इस्तेमाल की गणना सिर्फ़ सही एक्सेस पक्का करने के लिए की जाती है। आपकी आवाज़ कभी बेची या शेयर नहीं की जाती।',
+    AI_Usage: 'एआई उपयोग',
+    SavingRegular: 'आप नियमित रूप से बचत कर रहे हैं',
+
 };

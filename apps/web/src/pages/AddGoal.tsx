@@ -15,7 +15,7 @@ export default function AddGoal() {
             title,
             targetAmount: Number(amount)
         });
-        navigate('/savings');
+        navigate('/app/savings');
     }
 
     return (

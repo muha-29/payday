@@ -42,6 +42,14 @@ export default function Login() {
                 Continue with Google
             </button>
 
+            {/* Google */}
+            <button
+                onClick={comingSoon}
+                className="w-72 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-400 text-white font-medium shadow"
+            >
+                Continue with Digilocker
+            </button>
+
             {/* X */}
             <button
                 onClick={comingSoon}

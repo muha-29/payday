@@ -1,6 +1,7 @@
 import { SarvamAIClient } from "sarvamai";
 import { trackAiUsage } from "../middleware/trackAiUsage.js";
 import { estimateAudioDuration } from "../utils/estimateAudioDuration.js";
+import { localizeNumbersInText } from '../utils/numberLocale.js';
 
 
 const client = new SarvamAIClient({
@@ -33,6 +34,10 @@ export async function transcribe(audioBuffer, userId) {
 
     /* ---------- 2️⃣ Translate to English ---------- */
     if (language !== "en-IN") {
+      // transcript = localizeNumbersInText(
+      //   transcript,
+      //   language
+      // );
       try {
         const translation = await client.text.translate({
           input: transcript,

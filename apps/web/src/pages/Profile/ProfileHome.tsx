@@ -101,7 +101,7 @@ export default function ProfileHome() {
         {/* 🤖 AI Usage */}
         {aiUsage && (
           <div className="bg-white rounded-2xl p-4 shadow space-y-3">
-            <p className="font-medium">🤖 AI Usage</p>
+            <p className="font-medium">🤖 t{("AI_Usage")}</p>
 
             <UsageBar
               label="Voice Agent"
@@ -122,8 +122,7 @@ export default function ProfileHome() {
             /> */}
 
             <p className="text-[11px] text-stone-500">
-              AI usage is calculated only to ensure fair access.
-              Your voice is never sold or shared.
+              t{('AI_USAGE_DES')}
             </p>
           </div>
         )}

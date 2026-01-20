@@ -1,5 +1,59 @@
 import { connectDB as db } from '../db.js';
 
+import Income from '../models/income.model.js';
+
+export async function getEarningsChart(req, res) {
+    const userId = req.user.id;
+    const range = req.query.range || 'daily';
+
+    let groupBy;
+    let sortBy = { _id: 1 };
+
+    if (range === 'daily') {
+        // Group by day
+        groupBy = {
+            $dateToString: { format: '%Y-%m-%d', date: '$date' }
+        };
+    }
+
+    if (range === 'weekly') {
+        // Group by ISO week
+        groupBy = {
+            $dateToString: { format: '%Y-%U', date: '$date' }
+        };
+    }
+
+    if (range === 'monthly') {
+        // Group by month
+        groupBy = {
+            $dateToString: { format: '%Y-%m', date: '$date' }
+        };
+    }
+
+    try {
+        const data = await Income.aggregate([
+            { $match: { userId } },
+            {
+                $group: {
+                    _id: groupBy,
+                    total: { $sum: '$amount' }
+                }
+            },
+            { $sort: sortBy }
+        ]);
+
+        res.json(
+            data.map(d => ({
+                label: d._id,
+                value: d.total
+            }))
+        );
+    } catch (err) {
+        res.status(500).json({ error: 'Chart data failed' });
+    }
+}
+
+
 /**
  * Add earning
  */
