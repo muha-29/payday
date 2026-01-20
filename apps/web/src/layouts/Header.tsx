@@ -47,7 +47,7 @@ export default function Header({ name }: { name: string }) {
             {/* Status pill */}
             <div className="mt-3">
                 <span className="inline-block bg-white/90 text-orange-600 text-xs px-3 py-1 rounded-full">
-                    🔥 t{('SavingRegular')}
+                    🔥 {t('SavingRegular')}
                 </span>
             </div>
         </header>
