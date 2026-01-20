@@ -12,6 +12,10 @@ export async function getIncomes(): Promise<Income[]> {
   return apiFetch('/income');
 }
 
+export async function getEarningsChart(mode: string): Promise<any[]> {
+  return apiFetch(`/earnings/chart?mode=${mode}`);
+}
+
 export async function addIncome(payload: {
   amount: number;
   note?: string;

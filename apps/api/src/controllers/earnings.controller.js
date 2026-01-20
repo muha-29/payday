@@ -3,55 +3,63 @@ import { connectDB as db } from '../db.js';
 import Income from '../models/income.model.js';
 
 export async function getEarningsChart(req, res) {
-    const userId = req.user.id;
-    const range = req.query.range || 'daily';
-
-    let groupBy;
-    let sortBy = { _id: 1 };
-
-    if (range === 'daily') {
-        // Group by day
-        groupBy = {
-            $dateToString: { format: '%Y-%m-%d', date: '$date' }
-        };
+    const userId = req.headers["x-user-id"];
+    const range = req.query.range || 'weekly';
+    console.log('getEarnings', range);
+    if (range !== 'weekly') {
+        return res.status(400).json({ error: 'Only weekly shown here' });
     }
 
-    if (range === 'weekly') {
-        // Group by ISO week
-        groupBy = {
-            $dateToString: { format: '%Y-%U', date: '$date' }
-        };
-    }
+    // Start of week (Monday)
+    const start = new Date();
+    start.setDate(start.getDate() - start.getDay() + 1);
+    start.setHours(0, 0, 0, 0);
 
-    if (range === 'monthly') {
-        // Group by month
-        groupBy = {
-            $dateToString: { format: '%Y-%m', date: '$date' }
-        };
-    }
+    const end = new Date(start);
+    end.setDate(start.getDate() + 7);
 
-    try {
-        const data = await Income.aggregate([
-            { $match: { userId } },
-            {
-                $group: {
-                    _id: groupBy,
-                    total: { $sum: '$amount' }
-                }
-            },
-            { $sort: sortBy }
-        ]);
+    // Mongo aggregation (existing data)
+    const raw = await Income.aggregate([
+        {
+            $match: {
+                userId,
+                date: { $gte: start, $lt: end }
+            }
+        },
+        {
+            $group: {
+                _id: { $dayOfWeek: '$date' }, // 1 = Sunday
+                total: { $sum: '$amount' }
+            }
+        }
+    ]);
 
-        res.json(
-            data.map(d => ({
-                label: d._id,
-                value: d.total
-            }))
-        );
-    } catch (err) {
-        res.status(500).json({ error: 'Chart data failed' });
-    }
+    // Normalize to Mon–Sun
+    const dayMap = {
+        2: 'Mon',
+        3: 'Tue',
+        4: 'Wed',
+        5: 'Thu',
+        6: 'Fri',
+        7: 'Sat',
+        1: 'Sun'
+    };
+
+    const totalsByDay = {};
+    raw.forEach(d => {
+        totalsByDay[dayMap[d._id]] = d.total;
+    });
+
+    const orderedDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    const result = orderedDays.map(day => ({
+        label: day,
+        value: totalsByDay[day] || 0
+    }));
+
+    res.json(result);
 }
+
 
 
 /**

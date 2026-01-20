@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { speak } from '../../utils/speak';
 import { useProfile } from '../../hooks/useProfile';
 import { useI18n } from '../../hooks/useI18n';
-
+import toast from 'react-hot-toast';
 
 export default function AddIncome() {
     const { t } = useI18n();
@@ -18,8 +18,7 @@ export default function AddIncome() {
             amount: Number(amount),
             note: 'manual'
         });
-        console.log('profile', profile)
-        console.log('profile.language:', profile.language);
+        toast(t('AmountAddedSuccesfully'));
         // speak(
         //     `₹${amount} added to your earnings`,
         //     profile.language

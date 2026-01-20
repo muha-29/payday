@@ -6,6 +6,8 @@ import {
   addSavingsAmount,
   SavingsGoal
 } from '../../api/savings';
+import { Trash2 } from 'lucide-react';
+
 
 export default function Savings() {
   const [items, setItems] = useState<SavingsGoal[]>([]);
@@ -103,10 +105,12 @@ export default function Savings() {
 
                 <button
                   onClick={() => handleDelete(g._id)}
-                  className="text-red-500 text-xs"
+                  className="p-2 rounded-full hover:bg-red-50 transition"
+                  aria-label={t('delete') ?? 'Delete'}
                 >
-                  Delete
+                  <Trash2 size={20} className="text-red-500" />
                 </button>
+
               </div>
 
               {/* Progress */}

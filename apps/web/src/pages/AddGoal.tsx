@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGoal } from '../api/savings';
 import { useI18n } from '../hooks/useI18n';
+import toast from "react-hot-toast";
+
 
 export default function AddGoal() {
     const { t } = useI18n();
@@ -15,6 +17,8 @@ export default function AddGoal() {
             title,
             targetAmount: Number(amount)
         });
+        toast(t('AddedGoal'));
+
         navigate('/app/savings');
     }
 

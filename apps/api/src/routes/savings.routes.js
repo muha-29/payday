@@ -5,7 +5,8 @@ import {
   listSavings,
   updateSavings,
   deleteSavings,
-  addSavingsAmount
+  addSavingsAmount,
+  getSavingsSummary
 } from '../controllers/savings.controller.js';
 
 const router = express.Router();
@@ -15,5 +16,7 @@ router.get('/', requireAuth, listSavings);
 router.patch('/:id', requireAuth, updateSavings);
 router.delete('/:id', requireAuth, deleteSavings);
 router.post('/:id/add', requireAuth, addSavingsAmount);
+router.get('/summary', requireAuth, getSavingsSummary);
+
 
 export default router;

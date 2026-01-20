@@ -16,7 +16,7 @@ export async function addIncome(req, res) {
 
 export async function deleteIncome(req, res) {
   await Income.deleteOne({ _id: req.params.id, userId: req.user.id });
-  res.status(204).end();
+  res.status(201).json({message : 'Deleted'});
 }
 export async function updateIncome(req, res) {
   const updatedIncome = await Income.findOneAndUpdate(

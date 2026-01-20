@@ -16,10 +16,6 @@ import { loadKnowledgeBase } from "../rag/loadKnowledgeBase.js";
 import { assertEnv } from "./utils/assertEnv.js";
 import { authMiddleware } from "./middleware/auth.js";
 import aiProfileRoute from './routes/profile.ai.js';
-import { getDashboard } from './controllers/dashboard.controller.js';
-import { getEarningsChart } from './controllers/earnings.controller.js';
-import { getSavingsSummary } from './controllers/savings.controller.js';
-
 assertEnv(); // 🔒 fail fast if env missing
 
 
@@ -68,9 +64,6 @@ app.use("/api/ocr", ocrRoutes);
 app.use("/audio", express.static("public/audio"));
 app.use("/api/stt", sttRoute);
 app.use("/api/usage", aiProfileRoute);
-router.get('/dashboard', getDashboard);
-router.get('/earnings/chart', getEarningsChart);
-router.get('/savings/summary', getSavingsSummary);
 
 
 

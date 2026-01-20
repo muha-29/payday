@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   getIncomes,
   deleteIncome,
+  getEarningsChart,
   Income
 } from '../../api/income';
 import { useI18n } from '../../hooks/useI18n';
@@ -15,78 +16,85 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
+import toast from 'react-hot-toast';
+import { Trash2 } from 'lucide-react';
+
 
 type ViewMode = 'daily' | 'weekly' | 'monthly';
 
-function aggregateEarnings(
-  items: Income[],
-  mode: 'daily' | 'weekly' | 'monthly'
-) {
-  const map: Record<string, number> = {};
+type ChartPoint = {
+  label: string;
+  value: number;
+};
 
-  items.forEach((i) => {
-    const date = new Date(i.date);
-    let key = '';
-
-    if (mode === 'daily') {
-      key = date.toLocaleDateString('en-IN', { weekday: 'short' });
-    }
-
-    if (mode === 'weekly') {
-      const week = Math.ceil(date.getDate() / 7);
-      key = `Week ${week}`;
-    }
-
-    if (mode === 'monthly') {
-      key = date.toLocaleDateString('en-IN', {
-        month: 'short',
-        year: 'numeric'
-      });
-    }
-
-    map[key] = (map[key] || 0) + i.amount;
-  });
-
-  return Object.entries(map).map(([label, value]) => ({
-    label,
-    value
-  }));
-}
-
-
-export default function Earnings() {
+export default function EarningsHome() {
   const { t } = useI18n();
-  const [items, setItems] = useState<Income[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState<ViewMode>('weekly');
   const navigate = useNavigate();
 
-  async function load() {
+  const [items, setItems] = useState<Income[]>([]);
+  const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const [mode, setMode] = useState<ViewMode>('weekly');
+  const [loading, setLoading] = useState(true);
+  const [chartLoading, setChartLoading] = useState(true);
+
+  /* =======================
+     LOAD EARNINGS LIST
+  ======================= */
+  async function loadIncomes() {
     setLoading(true);
-    const data = await getIncomes();
-    setItems(data);
-    setLoading(false);
+    try {
+      const data = await getIncomes();
+      setItems(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   }
 
+  /* =======================
+     LOAD CHART DATA (SERVER)
+  ======================= */
+  async function loadChart(range: ViewMode) {
+    setChartLoading(true);
+    try {
+      const data = await getEarningsChart(range);
+      setChartData(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setChartLoading(false);
+    }
+  }
+
+  /* =======================
+     DELETE INCOME
+  ======================= */
   async function handleDelete(id: string) {
     await deleteIncome(id);
-    load();
+    toast(t('earningsDeleted'));
+    loadIncomes();
+    loadChart(mode);
   }
 
+  /* =======================
+     EFFECTS
+  ======================= */
   useEffect(() => {
-    load();
+    loadIncomes();
+    loadChart(mode);
   }, []);
 
-  /* ===== SUMMARY ===== */
-  const totalWeek = useMemo(
-    () => items.reduce((s, i) => s + i.amount, 0),
-    [items]
-  );
+  useEffect(() => {
+    loadChart(mode);
+  }, [mode]);
 
-  /* ===== GRAPH DATA ===== */
-  const chartData = useMemo(
-    () => aggregateEarnings(items, mode),
-    [items, mode]
+  /* =======================
+     SUMMARY
+  ======================= */
+  const total = chartData.reduce(
+    (sum, d) => sum + d.value,
+    0
   );
 
   const maxValue = Math.max(
@@ -97,21 +105,26 @@ export default function Earnings() {
   return (
     <div className="relative px-4 pb-32 space-y-5">
 
+      {/* ===== TITLE ===== */}
       <h1 className="text-xl font-bold mt-4">
         {t('myEarnings')} 💵
       </h1>
 
-      {/* ===== SUMMARY ===== */}
+      {/* ===== SUMMARY CARD ===== */}
       <section className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-4 text-white">
         <p className="text-xs opacity-90">
-          {t('ThisWeek') ?? 'This Week'}
+          {mode === 'daily'
+            ? t('Today')
+            : mode === 'weekly'
+              ? t('ThisWeek')
+              : t('ThisMonth')}
         </p>
         <p className="text-2xl font-bold">
-          ₹{totalWeek}
+          ₹{total}
         </p>
       </section>
 
-      {/* ===== TOGGLE ===== */}
+      {/* ===== RANGE TOGGLE ===== */}
       <div className="flex bg-stone-100 rounded-xl p-1">
         {(['daily', 'weekly', 'monthly'] as ViewMode[]).map(v => (
           <button
@@ -133,56 +146,69 @@ export default function Earnings() {
           {t('IncomeOverview') ?? 'Income Overview'}
         </p>
 
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData}>
-            <XAxis
-              dataKey="label"
-              tick={{ fontSize: 10 }}
-            />
-            <YAxis hide />
-            <Tooltip />
-            <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-              {chartData.map((entry, index) => {
-                const intensity = entry.value / maxValue;
-                return (
-                  <Cell
-                    key={index}
-                    fill={`rgba(251,146,60,${0.3 + intensity * 0.7})`}
-                  />
-                );
-              })}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        {chartLoading ? (
+          <div className="h-full flex items-center justify-center text-stone-400">
+            {t('loading')}…
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 10 }}
+              />
+              <YAxis hide />
+              <Tooltip />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                {chartData.map((entry, index) => {
+                  const intensity = entry.value / maxValue;
+                  return (
+                    <Cell
+                      key={index}
+                      fill={`rgba(251,146,60,${0.25 + intensity * 0.75})`}
+                    />
+                  );
+                })}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </section>
 
       {/* ===== EARNINGS LIST ===== */}
-      <ul className="space-y-3">
-        {items.map((i) => (
-          <li
-            key={i._id}
-            className="flex items-center justify-between p-4 rounded-2xl bg-white shadow-sm"
-          >
-            <div>
-              <div className="text-lg font-semibold">
-                ₹{i.amount}
-              </div>
-              <div className="text-xs text-stone-500">
-                {new Date(i.date).toDateString()}
-              </div>
-            </div>
-
-            <button
-              onClick={() => handleDelete(i._id)}
-              className="text-red-500 text-sm"
+      {loading ? (
+        <div className="text-stone-400">
+          {t('loading')}…
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {items.map((i) => (
+            <li
+              key={i._id}
+              className="flex items-center justify-between p-4 rounded-2xl bg-white shadow-sm"
             >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+              <div>
+                <div className="text-lg font-semibold">
+                  ₹{i.amount}
+                </div>
+                <div className="text-xs text-stone-500">
+                  {new Date(i.date).toDateString()}
+                </div>
+              </div>
 
-      {/* ===== FLOATING ADD (UNCHANGED) ===== */}
+              <button
+                onClick={() => handleDelete(i._id)}
+                className="p-2 rounded-full hover:bg-red-50 transition"
+                aria-label={t('delete') ?? 'Delete'}
+              >
+                <Trash2 size={20} className="text-red-500" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* ===== FLOATING ADD BUTTON (UNCHANGED) ===== */}
       <button
         onClick={() => navigate('/app/add-income')}
         className="
@@ -193,6 +219,7 @@ export default function Earnings() {
           shadow-lg
           bg-gradient-to-r from-orange-500 to-amber-500
         "
+        aria-label="Add earning"
       >
         +
       </button>

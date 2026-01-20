@@ -1,7 +1,7 @@
 import Savings from '../models/savings.model.js';
 
 export async function getSavingsSummary(req, res) {
-  const userId = req.user.id;
+  const userId = req.headers["x-user-id"];
 
   const goals = await Savings.find({ userId });
 
