@@ -1,6 +1,11 @@
 export default {
-    greeting: 'வணக்கம்',
+    Home: 'முகப்பு',
+    Earnings: 'வருமானம்',
+    Savings: 'சேமிப்புகள்',
+    Learn: 'கற்றுக்கொள்ளுங்கள்',
+    More: 'மேலும்',
     todayEarnings: 'இன்றைய வருமானம்',
+    greeting: 'வணக்கம்',
     addSavings: 'சேமிப்பைச் சேர்க்கவும்',
     AddedGoal: 'இலக்கு வெற்றிகரமாக சேர்க்கப்பட்டது',
     AmountAddedSuccesfully: 'தொகை வெற்றிகரமாக சேர்க்கப்பட்டது',

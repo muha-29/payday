@@ -86,9 +86,28 @@ function numberToWordsBasic(num, lang) {
 export function localizeNumbersInText(text, lang) {
     if (!text || !lang || lang === 'en') return text;
 
-    return text.replace(/\d+/g, (match) => {
-        const n = Number(match);
-        if (Number.isNaN(n)) return match;
-        return numberToWordsBasic(n, lang);
+    let found = false;
+
+    const result = text.replace(/₹?\d+(\.\d+)?/g, (match) => {
+        found = true;
+
+        // Remove currency symbol
+        const num = Number(match.replace('₹', ''));
+        if (Number.isNaN(num)) return match;
+
+        const words = numberToWordsBasic(num, lang);
+
+        return match.startsWith('₹')
+            ? `${words}`
+            : words;
     });
+
+    if (!found) {
+        console.warn(
+            `[NumberLocalization] No digits found in text: "${text}"`
+        );
+        return text;
+    }
+
+    return result;
 }

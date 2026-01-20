@@ -1,6 +1,11 @@
 export default {
-    greeting: 'హలో',
+    Home: 'హోమ్',
+    Earnings: 'ఆదాయం',
+    Savings: 'సేవింగ్స్',
+    Learn: 'లెర్న్',
+    More: 'మోర్',
     todayEarnings: 'ఈ రోజు ఆదాయం',
+    greeting: 'హలో',
     addSavings: 'సేవింగ్స్ జోడించండి',
     AddedGoal: 'లక్ష్యం విజయవంతంగా జోడించబడింది',
     AmountAddedSuccesfully: 'మొత్తం విజయవంతంగా జోడించబడింది',

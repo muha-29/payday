@@ -1,6 +1,11 @@
 export default {
-    greeting: 'नमस्ते',
+    Home: 'होम',
+    Earnings: 'कमाई',
+    Savings: 'बचत',
+    Learn: 'सीखें',
+    More: 'और',
     todayEarnings: 'आज की कमाई',
+    greeting: 'नमस्ते',
     addSavings: 'बचत जोड़ें',
     AddedGoal: 'लक्ष्य सफलतापूर्वक जोड़ा गया',
     AmountAddedSuccesfully: 'राशि सफलतापूर्वक जोड़ी गई',
