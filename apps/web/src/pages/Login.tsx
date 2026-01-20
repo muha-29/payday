@@ -45,7 +45,7 @@ export default function Login() {
             {/* Google */}
             <button
                 onClick={comingSoon}
-                className="w-72 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-400 text-white font-medium shadow"
+                className="w-72 py-3 rounded-xl border border-stone-300 text-stone-700 hover:bg-stone-50"
             >
                 Continue with Digilocker
             </button>
