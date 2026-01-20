@@ -7,7 +7,8 @@ import { useI18n } from '../hooks/useI18n';
 export default function Header({ name }: { name: string }) {
     const navigate = useNavigate();
     const { t } = useI18n();
-
+    const user = JSON.parse(localStorage.getItem('sb-gulszzctdimdcxfnehjo-auth-token')).user.user_metadata;
+    // avatar_url
     return (
         <header className="bg-gradient-to-b from-orange-500 to-amber-600 px-4 pt-4 pb-6 rounded-b-2xl">
             <div className="flex justify-between items-start">
@@ -37,10 +38,19 @@ export default function Header({ name }: { name: string }) {
                     {/* Profile */}
                     <button
                         onClick={() => navigate('/app/profile')}
-                        className="bg-white p-2 rounded-full"
+                        className="bg-white p-1 rounded-full w-9 h-9 flex items-center justify-center overflow-hidden"
                     >
-                        <User size={18} className="text-orange-500" />
+                        {user?.avatar_url ? (
+                            <img
+                                src={user.avatar_url}
+                                alt="Profile"
+                                className="w-full h-full object-cover rounded-full"
+                            />
+                        ) : (
+                            <User size={18} className="text-orange-500" />
+                        )}
                     </button>
+
                 </div>
             </div>
 
