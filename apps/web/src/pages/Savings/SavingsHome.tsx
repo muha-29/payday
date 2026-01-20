@@ -7,9 +7,12 @@ import {
   SavingsGoal
 } from '../../api/savings';
 import { Trash2 } from 'lucide-react';
+import { useI18n } from '../../hooks/useI18n';
+
 
 
 export default function Savings() {
+  const { t } = useI18n();
   const [items, setItems] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
