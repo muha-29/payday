@@ -1,100 +1,217 @@
-# PayDay
+# 📱 PayDay – Voice-First AI Financial Assistant
 
-Personal financial assistant for Indian gig workers.
+PayDay is a **voice-first, AI-powered personal finance assistant** built for Indian users, with a strong focus on **regional languages**, **low-literacy accessibility**, and **offline-tolerant usage**. The platform enables users to track earnings, manage savings goals, and receive AI-driven insights through both **text and voice interfaces**.
 
-## Monorepo Structure
-- apps/web        → React frontend
-- apps/edge       → Supabase Edge Functions
-- packages/shared → Shared types & constants
-- packages/ai     → AI prompts & schemas
-- infra           → MongoDB & Ollama configs
+This repository contains the **full-stack implementation** covering frontend, backend services, and the AI orchestration layer.
 
+---
 
-Frontend (Web)
- ├─ Mic input (Web Speech API)
- ├─ Wake button (🎤 Ask PayDay)
- ├─ Text transcript
- └─ Audio playback (TTS)
+## 🚀 Key Features
 
-Backend (API)
- ├─ Context builder (earnings, savings, goals)
- ├─ AI prompt orchestration
- └─ Response formatter
+* 💰 Earnings tracking with daily, weekly, and monthly insights
+* 🎯 Savings goals with progress tracking
+* 📊 Real-time dashboards and server-driven charts
+* 🗣️ Voice-first interaction (STT → AI → TTS)
+* 🌐 Regional language support (Tamil, Telugu, Hindi, English)
+* 🤖 AI financial coach with safe, rule-based guidance
+* 📱 Mobile-first, low-bandwidth friendly UI
 
-AI Layer (Low-cost)
- ├─ Groq / OpenAI (text only)
- ├─ No vector DB initially
- └─ Short prompts (cost control)
+---
 
+## 🧱 Technology Stack
 
+### Frontend
 
-| Layer         | Choice                          | Reason                         |
-| ------------- | ------------------------------- | ------------------------------ |
-| Speech → Text | **Browser Web Speech API**      | Free, instant, no backend cost |
-| AI Reasoning  | **Groq / OpenAI (gpt-4o-mini)** | Cheap, fast                    |
-| Text → Speech | **Browser SpeechSynthesis API** | Free                           |
-| Context       | Your existing MongoDB           | Already there                  |
-| Hosting       | Same backend                    | No infra change                |
+* **React + TypeScript** – Web frontend
+* **Vite** – Build tooling and dev server
+* **Tailwind CSS** – Lightweight, utility-first UI framework
+* **Recharts** – Server-driven charts and analytics
+* **React Router** – Client-side routing
+* **Custom i18n system** – Regional language support
+* **Lucide React** – Iconography
 
+### Backend
 
+* **Node.js** – Runtime
+* **Express.js** – API framework
+* **MongoDB** – Primary data store
+* **Mongoose** – ODM and aggregation layer
+* RESTful, cloud-native API design
+* Server-side aggregation for financial data (daily / weekly / monthly)
 
+### AI Stack
 
-🎧 PayDay Voice Agent — Final End-to-End Flow
-What you want (confirmed)
+* **Sarvam AI**
 
-🎤 User speaks (Indian language)
+  * Speech-to-Text (STT) for Indian accents
+  * Text-to-Speech (TTS) for regional languages
+* **LLM-based Conversational Agent**
+* Server-side translation and localization pipeline
+* Number-to-speech localization for regional TTS
+* Rule-based AI safety layer with failure isolation
 
-📝 Speech → Text (browser)
+---
 
-🧠 Text → Groq LLM (with user financial context)
+## 🧩 High-Level Architecture
 
-🌍 LLM responds in user’s selected regional language
-
-🔊 Response is spoken by PayDay
-
-🗂️ Conversation history (voice + text + language) stored in MongoDB
-
-🔁 User never needs to read unless they want to
-
-This is correct architecture. Now let’s implement it step-by-step.
-
-🧠 High-Level Architecture (Final)
-Frontend (Browser)
- ├─ Voice input (Web Speech API)
- ├─ Transcript (text)
- ├─ Send text + language to backend
- ├─ Receive AI response
- ├─ Speak response (SpeechSynthesis)
- └─ Optional transcript display
-
-Backend (API)
- ├─ Authenticated user
- ├─ Build financial context
- ├─ Send prompt to Groq
- ├─ Receive AI response (text)
- ├─ Persist conversation in MongoDB
- └─ Return response to frontend
-
-
-No extra services. No heavy infra. Low cost.
-
-🧠 Target Architecture (High-Level)
-        User Voice (Mic)
+```
+Frontend (Web / Mobile)
+        |
+        | REST APIs
         ↓
-        Speech → Text (browser, language-aware)
+Backend (Node + Express)
+        |
+        | MongoDB Aggregations
         ↓
-        Intent Detection
+Database (MongoDB)
+        |
+        | AI Orchestration
         ↓
-        Context Builder (personalized)
-        ↓
-        LLM (Groq / future models)
-        ↓
-        Response (language-specific)
-        ↓
-        Text → Speech (same language)
-        ↓
-        Persist Conversation (MongoDB)
+STT → AI Agent → Translation → Number Localization → TTS
+```
 
+---
 
+## 🔄 End-to-End AI Voice Flow
 
+This is the **core architectural flow** that powers PayDay’s voice-first experience.
 
+### 1️⃣ User Input (Voice)
+
+The user speaks in their preferred regional language.
+
+### 2️⃣ Speech-to-Text (STT)
+
+Sarvam AI converts spoken input into text, optimized for Indian accents.
+
+### 3️⃣ Conversational AI Agent
+
+* Intent is detected (earnings, savings, insights, etc.)
+* AI generates responses **in English** for consistency, safety, and cost efficiency
+
+### 4️⃣ Translation & Localization
+
+* AI output is translated into the user’s preferred language
+* Numeric values are converted into **spoken regional words**
+
+  * Example: `₹20` → `இருபது / ఇరవై / बीस`
+
+### 5️⃣ Text-to-Speech (TTS)
+
+Localized text is converted back into natural, regional speech.
+
+### 6️⃣ Response Delivery
+
+The user receives a clear and natural voice response in their language.
+
+---
+
+## 🧠 AI Safety & Reliability
+
+* AI provides **advisory-only financial guidance**
+* Rule-based validation layer enforces safe responses
+* AI failures never block:
+
+  * Dashboards
+  * Earnings tracking
+  * Savings flows
+* Designed for future human override and escalation
+
+---
+
+## 📊 Data & Dashboard Architecture
+
+### Server-Side Aggregation
+
+All financial calculations are handled server-side to ensure:
+
+* Accuracy and consistency
+* Complete time-series data (including zero-value days)
+* No frontend data drift
+
+### Key APIs
+
+* `GET /api/dashboard` – Summary stats + AI insight
+* `GET /api/earnings/chart?range=daily|weekly|monthly` – Chart-ready data
+* `GET /api/incomes` – Earnings list
+* `GET /api/savings` – Savings goals and progress
+
+Charts always render **full calendar ranges** (e.g., all 7 days of a week).
+
+---
+
+## 🌐 Localization & Regional Language Support
+
+* User language preference stored in profile (`/me`)
+* AI insights localized server-side
+* Frontend remains language-agnostic
+* Supported languages:
+
+  * English (`en`)
+  * Tamil (`ta`)
+  * Telugu (`te`)
+  * Hindi (`hi`)
+
+---
+
+## 📴 Offline & Low-Literacy Support
+
+* Voice-first UX minimizes reading dependency
+* Cached views for poor connectivity
+* Graceful degradation on slow networks
+* Minimal frontend computation
+
+---
+
+## 🛡️ Security & Compliance
+
+* JWT-based authentication
+* Server-side enforcement of business logic
+* No sensitive calculations on frontend
+* Data hosted on **India-based servers**
+* Architecture ready for fintech compliance extensions
+
+---
+
+## 🧪 Development Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Run backend
+npm run dev
+
+# Run frontend
+npm run dev
+```
+
+### Environment Variables
+
+```
+MONGODB_URI=
+JWT_SECRET=
+SARVAM_API_KEY=
+```
+
+---
+
+## 🛣️ Roadmap
+
+* 🔔 Real-time updates via WebSockets
+* 📈 Advanced analytics (streaks, trends)
+* 🎯 Savings projections and insights
+* 📞 Human advisor escalation
+* 🌍 Support for additional Indian languages
+
+---
+
+## 👤 Ownership & Contributions
+
+Core system architecture, backend services, AI orchestration, and regional language R&D were designed and implemented with a focus on **scalability**, **correctness**, and **inclusive access for Indian users**.
+
+---
+
+## 📄 License
+
+MIT License (update as applicable)
