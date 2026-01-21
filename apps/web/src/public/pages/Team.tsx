@@ -38,7 +38,7 @@ const team: TeamMember[] = [
     }, {
         name: 'Akash',
         role: 'Founder & Product',
-        bio: 'Building PayDay to simplify money for everyday Indians.',
+        bio: 'Initiated the app groundwork and frontend prototype development, creating initial interactive flows for daily behavioural nudges, government scheme enrolment screens, voice-first onboarding simulations, and core navigation patterns. His foundational client-side implementation, including responsive UI components, functionality testing, and early prototype demos, established a solid base that enabled Younus to seamlessly expand with advanced backend features.',
         links: {
             linkedin: 'https://www.linkedin.com/in/akash-singh-466794211/',
         }
