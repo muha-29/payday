@@ -21,27 +21,32 @@ const team: TeamMember[] = [
         }
     },
     {
-        name: 'Backend Lead',
+        name: 'Shubham Junankar',
         role: 'Systems & Scale',
-        bio: 'Making PayDay fast, secure, and reliable.'
+        bio: 'Owned document compilation for business sections alongside visuals/charts creation (Lean Canvas, market sizing graphs, competitor matrices, financial models). He specialized in appendices and success metrics dashboards, integrating market data, conducted thorough reviews, and added final touches to the report',
+        links: {
+            linkedin: 'https://www.linkedin.com/in/shubham-junankar-221a26151/',
+        }
     },
     {
-        name: 'Community',
+        name: 'Prathiba P',
         role: 'User Growth',
-        bio: 'Listening to users and improving PayDay every day.'
+        bio: 'Exclusively designed wireframes, workflows, empathy maps, and Figma prototypes (personas like Anand, voice onboarding tours, information architecture). She ensured low-literacy accessibility in visual UX, aligning designs with research findings through proactive team contributions and follow-ups ',
+        links: {
+            linkedin: 'https://www.linkedin.com/in/prathiba-p-50a948222/',
+        }
     }, {
         name: 'Akash',
         role: 'Founder & Product',
         bio: 'Building PayDay to simplify money for everyday Indians.',
         links: {
-            linkedin: 'https://linkedin.com/in/akash',
-            twitter: 'https://x.com/akash'
+            linkedin: 'https://www.linkedin.com/in/akash-singh-466794211/',
         }
     },
     {
         name: 'Younus',
-        role: 'Frontend & UX',
-        bio: 'Frontend-focused Software Engineer with 5 years building scalable health-tech platforms. Proven expertise in React, Node.js & TypeScript, with a track record of optimizing performance and driving adoption.',
+        role: 'Fullstack Engineer',
+        bio: 'Took ownership of application development and technical direction, scaling the product from an early prototype into an AI-powered financial platform. Led R&D to identify and integrate Sarvam AI for Indian regional language support, and architected the orchestration layer connecting Speech-to-Text, the LLM-based AI agent, and Text-to-Speech. Built robust backend services for AI coaching, real-time financial analytics, and savings workflows, resolving key architectural bottlenecks and enabling a voice-first experience for offline and low-literacy users.Took ownership of application development and technical direction, scaling the product from an early prototype into an AI-powered financial platform. Led R&D to identify and integrate Sarvam AI for Indian regional language support, and architected the orchestration layer connecting Speech-to-Text, the LLM-based AI agent, and Text-to-Speech. Built robust backend services for AI coaching, real-time financial analytics, and savings workflows, resolving key architectural bottlenecks and enabling a voice-first experience for offline and low-literacy users.',
         links: {
             linkedin: 'https://www.linkedin.com/in/younus183/',
             portfolio: 'https://younus-portfolio.lovable.app',
